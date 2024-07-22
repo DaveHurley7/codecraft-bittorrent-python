@@ -7,11 +7,11 @@ import sys
 
 def get_item_length(value):
     if isinstance(value,str):
-        print("STR")
+        #print("STR")
         strlen = str(len(value)).encode()
         return len(strlen+b":"+value)
     elif isinstance(value,int):
-        print("INT")
+        #print("INT")
         intstr = str(value).encode()
         return len(b"i"+intstr+b"e")
     else:
@@ -22,7 +22,6 @@ def get_item_length(value):
 # - decode_bencode(b"5:hello") -> b"hello"
 # - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
-    print(bencoded_value)
     if chr(bencoded_value[0]).isdigit():
         first_colon_index = bencoded_value.find(b":")
         if first_colon_index == -1:
