@@ -40,6 +40,7 @@ def decode_bencode(bencoded_value):
             item = decode_bencode(bencoded_value)
             blist.append(item)
             itemlen = get_item_length(item)
+            print(itemlen)
             bencoded_value = bencoded_value[itemlen+1:]
         return blist
     else:
