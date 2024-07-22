@@ -20,7 +20,6 @@ def get_item_length(value):
 # - decode_bencode(b"5:hello") -> b"hello"
 # - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
-    print("VALUE",bencoded_value)
     if chr(bencoded_value[0]).isdigit():
         first_colon_index = bencoded_value.find(b":")
         if first_colon_index == -1:
@@ -34,8 +33,8 @@ def decode_bencode(bencoded_value):
         return int(bencoded_value[1:idx_of_e])
     elif chr(bencoded_value[0]) == "l":
         blist = b"["
+        bencoded_value = bencoded_value[1:]
         while chr(bencoded_value[0]) != "e":
-            bencoded_value = bencoded_value[1:]
             item = decode_bencode(bencoded_value)
             blist += item
             itemlen = get_item_length(item)
