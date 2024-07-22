@@ -14,6 +14,8 @@ def get_item_length(value):
         return len(b"i"+intstr+b"e")
     else:
         print("Unsupported item")
+        print(value)
+        quit()
     
 # Examples:
 #
