@@ -24,6 +24,7 @@ def decode_bencode(bencoded_value):
         blist = []
         bencoded_value = bencoded_value[1:]
         while bencoded_value[0:1] != b"e":
+            print(bencoded_value)
             blist.append(decode_bencode(bencoded_value))
         return blist, bencoded_value[1:]
     else:
