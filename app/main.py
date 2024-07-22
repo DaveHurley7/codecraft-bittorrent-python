@@ -36,7 +36,7 @@ def decode_bencode(bencoded_value):
             if not isinstance(key,bytes):
                 raise ValueError("Key must be of type string")
             value, bencoded_value = decode_bencode(bencoded_value)
-            bdict[key] = value
+            bdict[key.decode()] = value
         return bdict, bencoded_value[1:]
     else:
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
