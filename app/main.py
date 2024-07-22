@@ -6,13 +6,10 @@ import sys
 
 
 def get_item_length(value):
-    print(type(value))
-    if isinstance(value,str):
-        print("STR")
+    if isinstance(value,bytes):
         strlen = str(len(value)).encode()
         return len(strlen+b":"+value)
     elif isinstance(value,int):
-        print("INT")
         intstr = str(value).encode()
         return len(b"i"+intstr+b"e")
     else:
