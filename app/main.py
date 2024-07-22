@@ -23,12 +23,14 @@ def decode_bencode(bencoded_value):
     if chr(bencoded_value[0]).isdigit():
         first_colon_index = bencoded_value.find(b":")
         if first_colon_index == -1:
+            print(bencoded_value)
             raise ValueError("Invalid encoded value")
         strlen = int(bencoded_value[:first_colon_index])
         return bencoded_value[first_colon_index+1:first_colon_index+1+strlen]
     elif bencoded_value[0:1] == b"i":
         idx_of_e = bencoded_value.find(b"e")
         if idx_of_e == -1:
+            print(bencoded_value)
             raise ValueError("Invalid encoded value")
         return int(bencoded_value[1:idx_of_e])
     elif bencoded_value[0:1] == b"l":
