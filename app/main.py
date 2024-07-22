@@ -7,9 +7,11 @@ import sys
 
 def get_item_length(value):
     if isinstance(value,str):
+        print("STR")
         strlen = str(len(value)).encode()
         return len(strlen+b":"+value)
     elif isinstance(value,int):
+        print("INT")
         intstr = str(value).encode()
         return len(b"i"+intstr+b"e")
     else:
@@ -26,15 +28,15 @@ def decode_bencode(bencoded_value):
             raise ValueError("Invalid encoded value")
         strlen = int(bencoded_value[:first_colon_index])
         return bencoded_value[first_colon_index+1:first_colon_index+1+strlen]
-    elif chr(bencoded_value[0]) == "i":
+    elif bencoded_value[0] == b"i":
         idx_of_e = bencoded_value.find(b"e")
         if idx_of_e == -1:
             raise ValueError("Invalid encoded value")
         return int(bencoded_value[1:idx_of_e])
-    elif chr(bencoded_value[0]) == "l":
+    elif bencoded_value[0] == b"l":
         blist = []
         bencoded_value = bencoded_value[1:]
-        while chr(bencoded_value[0]) != "e":
+        while bencoded_value[0] != b"e":
             item = decode_bencode(bencoded_value)
             blist.append(item)
             itemlen = get_item_length(item)
