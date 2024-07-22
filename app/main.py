@@ -32,16 +32,13 @@ def decode_bencode(bencoded_value):
             raise ValueError("Invalid encoded value")
         return int(bencoded_value[1:idx_of_e])
     elif chr(bencoded_value[0]) == "l":
-        blist = b"["
+        blist = []
         bencoded_value = bencoded_value[1:]
         while chr(bencoded_value[0]) != "e":
             item = decode_bencode(bencoded_value)
-            blist += item
+            blist.append(item)
             itemlen = get_item_length(item)
             bencoded_value = bencoded_value[itemlen+1:]
-            if chr(bencoded_value[0]) != "e":
-                blist += b","
-        blist += b"]"
         return blist
     else:
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
