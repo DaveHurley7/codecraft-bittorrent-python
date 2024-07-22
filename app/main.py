@@ -32,7 +32,6 @@ def decode_bencode(bencoded_value):
         bencoded_value = bencoded_value[1:]
         while bencoded_value[0:1] != b"e":
             key, bencoded_value = decode_bencode(bencoded_value)
-            print(key,bencoded_value)
             if not isinstance(key,bytes):
                 raise ValueError("Key must be of type string")
             value, bencoded_value = decode_bencode(bencoded_value)
