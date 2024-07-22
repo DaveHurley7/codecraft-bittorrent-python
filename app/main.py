@@ -15,7 +15,7 @@ def decode_bencode(bencoded_value):
             raise ValueError("Invalid encoded value")
         return bencoded_value[first_colon_index+1:]
     elif chr(bencoded_value[0]) == "i":
-        idx_of_e = bencoded_value.find("e")
+        idx_of_e = bencoded_value.find(b"e")
         if idx_of_e == -1:
             raise ValueError("Invalid encoded value")
         return bencoded_value[1:idx_of_e]
