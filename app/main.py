@@ -27,6 +27,16 @@ def decode_bencode(bencoded_value):
             item, bencoded_value = decode_bencode(bencoded_value)
             blist.append(item)
         return blist, bencoded_value[1:]
+    elif bencoded_value[0:1] == b"d":
+        bdict = {}
+        bencoded_value = bencoded_value[1:]
+        while bencoded_value[0:1] != b"e":
+            key, bencoded_value = decode_bencode(bencoded_value)
+            if not isinstance(key,str):
+                raise ValueError("Key must be of type string")
+            value, bencoded_value = decode_bencode(bencoded_value)
+            bdict[key] = value
+        return bdict, bencoded_value[1:]
     else:
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
 
