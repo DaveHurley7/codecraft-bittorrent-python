@@ -3,19 +3,6 @@ import sys
 
 # import bencodepy - available if you need it!
 # import requests - available if you need it!
-
-
-def get_item_length(value):
-    if isinstance(value,bytes):
-        strlen = str(len(value)).encode()
-        return len(strlen+b":"+value)
-    elif isinstance(value,int):
-        intstr = str(value).encode()
-        return len(b"i"+intstr+b"e")
-    else:
-        print("Unsupported item")
-        print(value)
-        quit()
     
 # Examples:
 #
@@ -27,21 +14,18 @@ def decode_bencode(bencoded_value):
         if first_colon_index == -1:
             raise ValueError("Invalid encoded value")
         strlen = int(bencoded_value[:first_colon_index])
-        return bencoded_value[first_colon_index+1:first_colon_index+1+strlen]
+        return bencoded_value[first_colon_index+1:first_colon_index+1+strlen], bencoded_value[first_colon_index+1+strlen:]
     elif bencoded_value[0:1] == b"i":
         idx_of_e = bencoded_value.find(b"e")
         if idx_of_e == -1:
             raise ValueError("Invalid encoded value")
-        return int(bencoded_value[1:idx_of_e])
+        return int(bencoded_value[1:idx_of_e]), bencoded_value[idx_of_e+1:]
     elif bencoded_value[0:1] == b"l":
         blist = []
         bencoded_value = bencoded_value[1:]
         while bencoded_value[0:1] != b"e":
-            item = decode_bencode(bencoded_value)
-            blist.append(item)
-            itemlen = get_item_length(item)
-            bencoded_value = bencoded_value[itemlen:]
-        return blist
+            blist.append(decode_bencode(bencoded_value))
+        return blist, bencoded_value[1:]
     else:
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
 
@@ -66,7 +50,8 @@ def main():
             raise TypeError(f"Type not serializable: {type(data)}")
 
         # Uncomment this block to pass the first stage
-        print(json.dumps(decode_bencode(bencoded_value), default=bytes_to_str))
+        decoded, _ = decode_bencode(bencoded_value)
+        print(json.dumps(decoded, default=bytes_to_str))
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
