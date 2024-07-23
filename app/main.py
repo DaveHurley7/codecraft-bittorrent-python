@@ -105,7 +105,6 @@ def url_encode(data):
     url_encoded = ""
     print(data)
     for b in data:
-        print("TYPE:",type(b))
         if b < 0x21 or b > 0x7e or b in [0x23,0x24,0x25,0x26,0x2b,0x2c,0x2f,0x3a,0x3b,0x3d,0x3f,0x40]:
             url_encoded += percent_encode(b)
         else:
