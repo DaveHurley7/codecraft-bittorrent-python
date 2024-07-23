@@ -61,7 +61,6 @@ def enc_bencode(value):
             enc_val += bkey + bval
         enc_val += b"e"
     else:
-        print("Unsupported type")
         return b""
     return enc_val
 
