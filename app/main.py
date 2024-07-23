@@ -170,6 +170,7 @@ def main():
         decoded, _ = decode_bencode(benc_content)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
+        print("Tracke",tracker)
         file_len = decoded["info"]["length"]
         get_peer_list(tracker,info_hash,file_len)
     else:
