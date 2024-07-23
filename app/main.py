@@ -42,7 +42,7 @@ def decode_bencode(bencoded_value):
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
         
 def enc_bencode(value):
-    if isinstance(value,str):
+    if isinstance(value,bytes):
         strlen = str(len(value)).encode()
         enc_val = strlen + b":" + value
     elif isinstance(value,int):
@@ -61,6 +61,7 @@ def enc_bencode(value):
             enc_val += bkey + bval
         enc_val += b"e"
     else:
+        print("Unsupported type")
         return b""
     return enc_val
 
