@@ -117,13 +117,13 @@ def get_peer_list(tracker_url,info_hash,file_len):
     sk.connect((host,port))
     print("Connected to",host,port)
     #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
-    msg = ("GET /"+ path + "?info_hash=" + info_hash + "&peer_id=84922341765498374098"
-            "&port=6881"
-            "&uploaded=0"
-            "&downloaded=0"
-            "&left=" + str(file_len) + "&compact=1 HTTP/1.1")
+    msg = (b"GET /"+ path.encode() + b"?info_hash=" + info_hash + b"&peer_id=84922341765498374098"
+            b"&port=6881"
+            b"&uploaded=0"
+            b"&downloaded=0"
+            b"&left=" + str(file_len).encode() + b"&compact=1 HTTP/1.1")
     print(msg)
-    sk.send(msg.encode())
+    sk.send(msg)
     resp = sk.recv(1024)
     print(resp)
 
