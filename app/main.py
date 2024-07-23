@@ -108,6 +108,7 @@ def url_encode(data):
             url_encoded += chr(b)
         else:
             url_encoded += percent_encode(b)
+    print("ENCODED",url_encoded)
     return url_encoded
 
 def get_peer_list(tracker_url,info_hash,file_len):
