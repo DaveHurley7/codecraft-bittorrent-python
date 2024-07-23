@@ -74,11 +74,11 @@ def make_hash(data):
     return hasher.hexdigest()
 
 def get_piece_hashes(str_hashlist):
-    print("HASHES:",str_hashlist)
+    #print("HASHES:",str_hashlist)
     hashes = []
-    while len(str_hashlist) >= 40:
-        hashes.append(str_hashlist[:40])
-        str_hashlist = str_hashlist[40:]
+    while len(str_hashlist) >= 20:
+        hashes.append(str_hashlist[:20].hex())
+        str_hashlist = str_hashlist[20:]
     return hashes
 
 def main():
