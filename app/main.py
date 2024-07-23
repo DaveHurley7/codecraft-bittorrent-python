@@ -120,7 +120,7 @@ def get_peer_list(tracker_url,info_hash,file_len):
            "&uploaded=0"
            "&downloaded=0"
            "&left=" + file_len
-           "&compact=1"
+           "&compact=1")
     print(msg)
     sk.send(msg.encode())
 
