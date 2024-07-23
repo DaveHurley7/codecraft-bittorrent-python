@@ -70,7 +70,7 @@ def main():
         tracker = decoded["announce"]
         file_len = decoded["info"]["length"]
         print("Tracker URL:",tracker)
-        print("Length:",file_Len)
+        print("Length:",file_len)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
