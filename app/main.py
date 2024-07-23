@@ -1,5 +1,6 @@
 import json
 import sys
+import hashlib
 
 # import bencodepy - available if you need it!
 # import requests - available if you need it!
@@ -39,7 +40,34 @@ def decode_bencode(bencoded_value):
         return bdict, bencoded_value[1:]
     else:
         raise NotImplementedError("Only strings, integers and lists are supported at the moment")
+        
+def enc_bencode(value):
+    if isinstance(value,str):
+        strlen = str(len(value)).encode()
+        enc_val = strlen + b":" + value
+    elif isinstance(value,int):
+        intstr = str(value).encode()
+        enc_val = b"i" + instr + b"e"
+    elif isinstance(value,list):
+        enc_val = b"l"
+        for item in value:
+            enc_val += enc_bencode(item)
+        enc_val += b"e"
+    elif isinstance(value,dict):
+        enc_val = b"d"
+        for k, v in value.items():
+            bkey = enc_bencode(k)
+            bval = enc_bencode(v)
+            enc_val += bkey + bval
+        enc_val += b"e"
+    else:
+        return b""
+    return enc_val
 
+def make_hash(data):
+    hasher = hashlib.sha1()
+    hasher.update(data)
+    return hasher.hexdigest()
 
 def main():
     command = sys.argv[1]
@@ -69,8 +97,10 @@ def main():
         decoded, _ = decode_bencode(benc_content)
         tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
+        info_hash = make_hash(enc_bencode(decoded["info"]))
         print("Tracker URL:",tracker)
         print("Length:",file_len)
+        print("Info Hash:",info_hash)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
