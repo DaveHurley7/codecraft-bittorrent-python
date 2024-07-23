@@ -67,7 +67,7 @@ def main():
         file = open(sys.argv[2],"rb")
         benc_content = file.read()
         decoded, _ = decode_bencode(benc_content)
-        tracker = decoded["announce"]
+        tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
         print("Tracker URL:",tracker)
         print("Length:",file_len)
