@@ -103,7 +103,6 @@ def percent_encode(n):
         
 def url_encode(data):
     url_encoded = ""
-    print(data)
     for b in data:
         if b < 0x21 or b > 0x7e or b in [0x23,0x24,0x25,0x26,0x2b,0x2c,0x2f,0x3a,0x3b,0x3d,0x3f,0x40]:
             url_encoded += percent_encode(b)
@@ -116,8 +115,8 @@ def get_peer_list(tracker_url,info_hash,file_len):
     host, port, path = get_url_sections(tracker_url)
     sk.connect((host,port))
     urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
-    print(type(urlenc_hash))
-    print(path)
+    print("TYPE:".type(urlenc_hash))
+    print("PATH:",path)
     msg = ("GET " + path + "?info_hash=" + urlenc_hash + ""
            "&peer_id=84922341765498374098"
            "&port=6881"
