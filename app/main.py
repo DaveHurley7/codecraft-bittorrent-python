@@ -112,7 +112,7 @@ def url_encode(data):
 
 def get_peer_list(tracker_url,info_hash,file_len):
     print("INFO HASH",info_hash)
-    print("AS    HEX",int(info_hash,16).to_bytes())
+    print("AS    HEX",int(info_hash,16).to_bytes(20))
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     host, port, path = get_url_sections(tracker_url)
     sk.connect((host,port))
