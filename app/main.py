@@ -113,8 +113,8 @@ def url_encode(data):
 def get_peer_list(tracker_url,info_hash,file_len):
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     host, port, path = get_url_sections(tracker_url)
-    sk.connect((host,80))
-    print("Connected to",host,80)
+    sk.connect((host,port))
+    print("Connected to",host,port)
     urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
     msg = ("GET /"+ path + "?info_hash=" + urlenc_hash + "&peer_id=84922341765498374098"
             "&port=6881"
@@ -170,7 +170,6 @@ def main():
         decoded, _ = decode_bencode(benc_content)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
-        print("Tracke",tracker)
         file_len = decoded["info"]["length"]
         get_peer_list(tracker,info_hash,file_len)
     else:
