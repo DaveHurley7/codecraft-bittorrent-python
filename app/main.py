@@ -47,7 +47,7 @@ def enc_bencode(value):
         enc_val = strlen + b":" + value
     elif isinstance(value,int):
         intstr = str(value).encode()
-        enc_val = b"i" + instr + b"e"
+        enc_val = b"i" + intstr + b"e"
     elif isinstance(value,list):
         enc_val = b"l"
         for item in value:
