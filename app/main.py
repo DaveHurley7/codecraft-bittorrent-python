@@ -88,7 +88,7 @@ def get_url_sections(url):
         port = 80
         if ":" in host:
             host, port = host.split(":")
-        return host, port, path
+        return host, int(port), path
     else:
         print("Not supporting https")
         
