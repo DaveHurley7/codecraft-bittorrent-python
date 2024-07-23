@@ -103,9 +103,7 @@ def percent_encode(n):
         
 def url_encode(data):
     url_encoded = ""
-    
     for b in data:
-        print("CHECK:",type(b))
         if (b > 0x20 and b < 0x7f) or (b not in [0x23,0x24,0x25,0x26,0x2b,0x2c,0x2f,0x3a,0x3b,0x3d,0x3f,0x40]):
             url_encoded += ord(b)
         else:
@@ -113,6 +111,7 @@ def url_encode(data):
     return url_encoded
 
 def get_peer_list(tracker_url,info_hash,file_len):
+    print("INFO HASH",info_hash)
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     host, port, path = get_url_sections(tracker_url)
     sk.connect((host,port))
