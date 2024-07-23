@@ -45,6 +45,9 @@ def enc_bencode(value):
     if isinstance(value,bytes):
         strlen = str(len(value)).encode()
         enc_val = strlen + b":" + value
+    elif isinstance(value,str):
+        strlen = str(len(value)).encode()
+        enc_val = strlen + b":" + value.encode()
     elif isinstance(value,int):
         intstr = str(value).encode()
         enc_val = b"i" + intstr + b"e"
