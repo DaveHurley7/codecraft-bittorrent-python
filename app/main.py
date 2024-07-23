@@ -61,6 +61,7 @@ def enc_bencode(value):
             enc_val += bkey + bval
         enc_val += b"e"
     else:
+        print("VAL:",type(value),value)
         return b""
     return enc_val
 
