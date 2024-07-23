@@ -69,10 +69,10 @@ def enc_bencode(value):
         return b""
     return enc_val
 
-def make_hash(data):
+def make_hash(data,as_text=False):
     hasher = hashlib.sha1()
     hasher.update(data)
-    return hasher.hexdigest()
+    return hasher.hexdigest() if as_test else hasher.digest()
 
 def get_piece_hashes(str_hashlist):
     hashes = []
@@ -116,8 +116,8 @@ def get_peer_list(tracker_url,info_hash,file_len):
     host, port, path = get_url_sections(tracker_url)
     sk.connect((host,port))
     print("Connected to",host,port)
-    urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
-    msg = ("GET /"+ path + "?info_hash=" + urlenc_hash + "&peer_id=84922341765498374098"
+    #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
+    msg = ("GET /"+ path + "?info_hash=" + info_hash + "&peer_id=84922341765498374098"
             "&port=6881"
             "&uploaded=0"
             "&downloaded=0"
@@ -156,7 +156,7 @@ def main():
         decoded, _ = decode_bencode(benc_content)
         tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
-        info_hash = make_hash(enc_bencode(decoded["info"]))
+        info_hash = make_hash(enc_bencode(decoded["info"]),True)
         piece_hashes = get_piece_hashes(decoded["info"]["pieces"])
         print("Tracker URL:",tracker)
         print("Length:",file_len)
