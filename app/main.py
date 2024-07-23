@@ -1,6 +1,7 @@
 import json
 import sys
 import hashlib
+import socket as skt
 
 # import bencodepy - available if you need it!
 # import requests - available if you need it!
@@ -74,12 +75,54 @@ def make_hash(data):
     return hasher.hexdigest()
 
 def get_piece_hashes(str_hashlist):
-    #print("HASHES:",str_hashlist)
     hashes = []
     while len(str_hashlist) >= 20:
-        hashes.append(str_hashlist[:20].hex())
+        hashes.append(str_hashlist[:20])
         str_hashlist = str_hashlist[20:]
     return hashes
+
+def get_url_sections(url):
+    if url.startswith("http://"):
+        url = url[7:]
+        host, path = url.split("/",1)
+        port = 80
+        if ":" in host:
+            host, port = host.split(":")
+        return host, port, path
+    else:
+        print("Not supporting https")
+        
+def percent_encode(n):
+    val = "%"
+    fbyte = n >> 4
+    lbyte = n & 0xf
+    hexdigits = "0123456789ABCDEF"
+    val += hexdigits[fbyte]
+    val += hexdigits[lbyte]
+    return val
+        
+def url_encode(data):
+    url_encoded = ""
+    for b in data:
+        if (b > 0x20 and b < 0x7f) or (not in [0x23,0x24,0x25,0x26,0x2b,0x2c,0x2f,0x3a,0x3b,0x3d,0x3f,0x40]):
+            url_encoded += ord(b)
+        else:
+            url_encoded += percent_encode(b)
+    return url_encoded
+
+def get_peer_list(tracker_url,info_hash,file_len):
+    sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
+    host, port, path = get_url_sections(tracker_url)
+    sk.connect((host,port))
+    msg = ("GET " + path + "?info_hash=" + url_encode(info_hash)
+           "&peer_id=84922341765498374098"
+           "&port=6881"
+           "&uploaded=0"
+           "&downloaded=0"
+           "&left=" + file_len
+           "&compact=1"
+    print(msg)
+    sk.send(msg.encode())
 
 def main():
     command = sys.argv[1]
@@ -106,6 +149,7 @@ def main():
     elif command == "info":
         file = open(sys.argv[2],"rb")
         benc_content = file.read()
+        file.close()
         decoded, _ = decode_bencode(benc_content)
         tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
@@ -116,8 +160,16 @@ def main():
         print("Info Hash:",info_hash)
         print("Piece Length:",decoded["info"]["piece length"])
         for phash in piece_hashes:
-            print(phash)
-        
+            print(phash.hex())
+    elif command == "peers":
+        file = open(sys.argv[2],"rb")
+        benc_content = file.read()
+        file.close()
+        decoded, _ = decode_bencode(benc_content)
+        tracker = decoded["announce"].decode()
+        info_hash = make_hash(enc_bencode(decoded["info"]))
+        file_len = decoded["info"]["length"]
+        get_peer_list(tracker,info_hash,file_len)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
