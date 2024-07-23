@@ -72,7 +72,7 @@ def enc_bencode(value):
 def make_hash(data,as_text=False):
     hasher = hashlib.sha1()
     hasher.update(data)
-    return hasher.hexdigest() if as_test else hasher.digest()
+    return hasher.hexdigest() if as_text else hasher.digest()
 
 def get_piece_hashes(str_hashlist):
     hashes = []
