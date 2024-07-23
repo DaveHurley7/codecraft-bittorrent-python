@@ -73,6 +73,13 @@ def make_hash(data):
     hasher.update(data)
     return hasher.hexdigest()
 
+def get_piece_hashes(str_hashlist):
+    hashes = []
+    while len(str_hashlist) >= 40:
+        hashes.append(str_hashlist[:40])
+        str_hashlist = str_hashlist[40:]
+    return hashes
+
 def main():
     command = sys.argv[1]
 
@@ -102,9 +109,14 @@ def main():
         tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
         info_hash = make_hash(enc_bencode(decoded["info"]))
+        piece_hashes = get_piece_hashes(decoded["info"]["pieces"])
         print("Tracker URL:",tracker)
         print("Length:",file_len)
         print("Info Hash:",info_hash)
+        print("Piece Length:",decoded["info"]["piece length"])
+        for phash in piece_hashes:
+            print(phash)
+        
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
