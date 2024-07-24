@@ -4,7 +4,7 @@ import hashlib
 import socket as skt
 
 # import bencodepy - available if you need it!
-# import requests - available if you need it!
+import requests #- available if you need it!
     
 # Examples:
 #
@@ -112,12 +112,14 @@ def url_encode(data):
 
 def get_peer_list(tracker_url,info_hash,file_len):
     print(tracker_url)
-    sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
-    host, port, path = get_url_sections(tracker_url)
-    sk.connect((host,port))
-    print("Connected to",host,port)
+    #sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
+    #host, port, path = get_url_sections(tracker_url)
+    #sk.connect((host,port))
+    #print("Connected to",host,port)
     #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
-    msg = (b"GET /"+ path.encode() + b"?info_hash=" + info_hash + b"&peer_id=84922341765498374098"
+    full_url = tracker_url.encode()
+    print(len(full_url))
+    msg += b"?info_hash=" + info_hash + b"&peer_id=00112233445566778899" #84922341765498374098"
             b"&port=6881"
             b"&uploaded=0"
             b"&downloaded=0"
