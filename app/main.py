@@ -159,7 +159,7 @@ def main():
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
         for peer in peers:
-            print(*peer)
+            print(*peer,sep=":")
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
