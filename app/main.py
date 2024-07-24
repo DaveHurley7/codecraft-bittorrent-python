@@ -119,15 +119,15 @@ def get_peer_list(tracker_url,info_hash,file_len):
     #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
     full_url = tracker_url.encode()
     print(len(full_url))
-    msg += (b"?info_hash=" + info_hash + b"&peer_id=00112233445566778899" #84922341765498374098"
+    msg = (b"?info_hash=" + info_hash + b"&peer_id=00112233445566778899" #84922341765498374098"
             b"&port=6881"
             b"&uploaded=0"
             b"&downloaded=0"
             b"&left=" + str(file_len).encode() + b"&compact=1 HTTP/1.1")
     print(msg)
-    sk.send(msg)
-    resp = sk.recv(1024)
-    print(resp)
+    #sk.send(msg)
+    #resp = sk.recv(1024)
+    #print(resp)
 
 def main():
     command = sys.argv[1]
