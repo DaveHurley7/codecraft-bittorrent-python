@@ -95,6 +95,7 @@ def extract_peers(peer_list):
         ip_addr = bytes_to_ip(ip_bytes)
         port = int.from_bytes(port_bytes)
         peers.append((ip_addr,port))
+    return peers
 
 def get_peer_list(tracker_url,info_hash,file_len):
     q_params = {
