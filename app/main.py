@@ -1,7 +1,6 @@
 import json
 import sys
 import hashlib
-import socket as skt
 
 # import bencodepy - available if you need it!
 import requests #- available if you need it!
@@ -81,42 +80,23 @@ def get_piece_hashes(str_hashlist):
         str_hashlist = str_hashlist[20:]
     return hashes
 
-def get_url_sections(url):
-    if url.startswith("http://"):
-        url = url[7:]
-        host, path = url.split("/",1)
-        port = 80
-        if ":" in host:
-            host, port = host.split(":")
-        return host, int(port), path
-    else:
-        print("Not supporting https")
-        
-def percent_encode(n):
-    val = "%"
-    fbyte = n >> 4
-    lbyte = n & 0xf
-    hexdigits = "0123456789ABCDEF"
-    val += hexdigits[fbyte]
-    val += hexdigits[lbyte]
-    return val
-        
-def url_encode(data):
-    url_encoded = ""
-    for b in data:
-        if b < 0x21 or b > 0x7e or b in [0x23,0x24,0x25,0x26,0x2b,0x2c,0x2f,0x3a,0x3b,0x3d,0x3f,0x40]:
-            url_encoded += percent_encode(b)
-        else:
-            url_encoded += chr(b)
-    return url_encoded
+def bytes_to_ip(ip_bytes):
+    ip_addr = ""
+    for b in ip_bytes:
+        ip_addr += str(b) + "."
+    return ip_addr[:-1]
+
+def extract_peers(peer_list):
+    peers = []
+    while peer_list:
+        ip_bytes = peer_list[:4]
+        port_bytes = peer_list[4:6]
+        peer_list = peer_list[6:]
+        ip_addr = bytes_to_ip(ip_bytes)
+        port = int.from_bytes(port_bytes)
+        peers.append((ip_addr,port))
 
 def get_peer_list(tracker_url,info_hash,file_len):
-    print(tracker_url)
-    #sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
-    #host, port, path = get_url_sections(tracker_url)
-    #sk.connect((host,port))
-    #print("Connected to",host,port)
-    #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
     q_params = {
         "info_hash": info_hash,
         "peer_id": "00112233445566778899",
@@ -128,10 +108,8 @@ def get_peer_list(tracker_url,info_hash,file_len):
     }
     resp = requests.get(tracker_url,params=q_params)
     content = decode_bencode(resp.content)
-    print(content)
-    #sk.send(msg)
-    #resp = sk.recv(1024)
-    #print(resp)
+    peer_iist = extract_peers(content["peers"])
+    return peer_list
 
 def main():
     command = sys.argv[1]
@@ -178,7 +156,9 @@ def main():
         tracker = decoded["announce"]
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
-        get_peer_list(tracker,info_hash,file_len)
+        peers = get_peer_list(tracker,info_hash,file_len)
+        for peer in peers:
+            print(*peer)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
