@@ -108,7 +108,7 @@ def get_peer_list(tracker_url,info_hash,file_len):
     }
     resp = requests.get(tracker_url,params=q_params)
     content = decode_bencode(resp.content)
-    peer_iist = extract_peers(content[0]["peers"])
+    peer_list = extract_peers(content[0]["peers"])
     return peer_list
 
 def main():
