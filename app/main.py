@@ -126,7 +126,7 @@ def get_peer_list(tracker_url,info_hash,file_len):
         "left": str(file_len),
         "compact": 1
     }
-    resp = requests.get(tracker_url.encode(),params=q_params)
+    resp = requests.get(tracker_url,params=q_params)
     content = decode_bencode(resp.content)
     print(content)
     #sk.send(msg)
