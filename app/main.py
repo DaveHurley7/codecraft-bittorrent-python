@@ -118,7 +118,7 @@ def get_peer_list(tracker_url,info_hash,file_len):
     #print("Connected to",host,port)
     #urlenc_hash = url_encode(int(info_hash,16).to_bytes(20))
     full_url = tracker_url.encode()
-    print(len(full_url))
+    print(len(info_hash))
     msg = (b"?info_hash=" + info_hash + b"&peer_id=00112233445566778899" #84922341765498374098"
             b"&port=6881"
             b"&uploaded=0"
