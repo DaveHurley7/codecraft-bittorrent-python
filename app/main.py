@@ -1,6 +1,7 @@
 import json
 import sys
 import hashlib
+import socket as skt
 
 # import bencodepy - available if you need it!
 import requests #- available if you need it!
@@ -112,6 +113,19 @@ def get_peer_list(tracker_url,info_hash,file_len):
     peer_list = extract_peers(content[0]["peers"])
     return peer_list
 
+def make_socket(csk_info):
+    host, port = csk_info.split(":")
+    return host, int(port)
+
+def to_hexstr(valstr):
+    vals = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"]
+    hexstr = ""
+    for b in valstr:
+        fbyte = b >> 4
+        lbyte = b & 15
+        hexstr += vals[fbyte] + vals[lbyte]
+    return hexstr
+
 def main():
     command = sys.argv[1]
 
@@ -160,6 +174,19 @@ def main():
         peers = get_peer_list(tracker,info_hash,file_len)
         for peer in peers:
             print(*peer,sep=":")
+    elif command == "handshake":
+        file = open(sys.argv[2],"rb")
+        csk_info = sys.argv[3] 
+        benc_content = file.read()
+        file.close()
+        decoded, _ = decode_bencode(benc_content)
+        info_hash = make_hash(enc_bencode(decoded["info"]))
+        sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
+        sk.connect(make_socket(csk_info))
+        sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
+        resp = sk.recv(100)
+        peer_id = resp[48:].decode()
+        print("Peer ID:",to_hexstr(peer_id))
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
