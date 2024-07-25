@@ -126,6 +126,21 @@ def to_hexstr(valstr):
         hexstr += vals[fbyte] + vals[lbyte]
     return hexstr
 
+def load_btfile_content(filename):
+    file = open(filename,"rb")
+    benc_content = file.read()
+    file.close()
+    decoded, _ = decode_bencode(benc_content)
+    return decode
+
+def peer_handshake(peer):
+    sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
+    sk.connect(make_socket(peer))
+    sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
+    resp = sk.recv(80)
+    peer_id = resp[48:]
+    print("Peer ID:",to_hexstr(peer_id))
+
 def main():
     command = sys.argv[1]
 
@@ -149,10 +164,7 @@ def main():
         decoded, _ = decode_bencode(bencoded_value)
         print(json.dumps(decoded, default=bytes_to_str))
     elif command == "info":
-        file = open(sys.argv[2],"rb")
-        benc_content = file.read()
-        file.close()
-        decoded, _ = decode_bencode(benc_content)
+        decoded = load_btfile_content(sys.argv[2])
         tracker = decoded["announce"].decode()
         file_len = decoded["info"]["length"]
         info_hash = make_hash(enc_bencode(decoded["info"]),True)
@@ -164,10 +176,7 @@ def main():
         for phash in piece_hashes:
             print(phash.hex())
     elif command == "peers":
-        file = open(sys.argv[2],"rb")
-        benc_content = file.read()
-        file.close()
-        decoded, _ = decode_bencode(benc_content)
+        decoded = load_btfile_content(sys.argv[2])
         tracker = decoded["announce"]
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
@@ -175,18 +184,44 @@ def main():
         for peer in peers:
             print(*peer,sep=":")
     elif command == "handshake":
-        file = open(sys.argv[2],"rb")
-        csk_info = sys.argv[3] 
-        benc_content = file.read()
-        file.close()
-        decoded, _ = decode_bencode(benc_content)
+        decoded = load_btfile_content(sys.argv[2])
         info_hash = make_hash(enc_bencode(decoded["info"]))
         sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
         sk.connect(make_socket(csk_info))
         sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
-        resp = sk.recv(100)
+        resp = sk.recv(80)
         peer_id = resp[48:]
         print("Peer ID:",to_hexstr(peer_id))
+    elif command == "download_piece":
+        btfile = None
+        piece_id = None
+        outdir = None
+        argc = 2
+        argmax = len(sys.argv)
+        while argc < argmax:
+            if sys.argv[argc].endswith(".torrent"):
+                btfile = sys.argv[argc]
+            elif sys.argv[argc] == "-o":
+                argc += 1
+                outdir = sys.argv[argc]
+            elif sys.argv[argc].isdigit():
+                piece_id = None
+            else:
+                print("invalid argument: ", sys.argv[argc])
+            argc += 1
+        if not btfile:
+            print("No .torrent file provided")
+            quit(1)
+        if not piece_id:
+            print("A piece must be specified")
+            quit(1)
+        decoded = load_btfile_content(btfile)
+        tracker = decoded["announce"].decode()
+        info_hash = make_hash(enc_bencode(decoded["info"]))
+        file_len = decoded["info"]["length"]
+        peers = get_peer_list(tracker,info_hash,file_len)
+        for peer in peers:
+            peer_handshake(peer)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
