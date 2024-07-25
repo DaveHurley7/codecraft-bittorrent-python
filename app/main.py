@@ -185,7 +185,7 @@ def main():
         sk.connect(make_socket(csk_info))
         sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
         resp = sk.recv(100)
-        peer_id = resp[48:].decode()
+        peer_id = resp[48:]
         print("Peer ID:",to_hexstr(peer_id))
     else:
         raise NotImplementedError(f"Unknown command {command}")
