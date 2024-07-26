@@ -220,6 +220,7 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
+        print("PEER_NUM",len(peers))
         for peer in peers:
             peer_handshake(peer,info_hash)
     else:
