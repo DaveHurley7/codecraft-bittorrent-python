@@ -139,7 +139,10 @@ def peer_handshake(peer,info_hash):
     sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
     resp = sk.recv(80)
     peer_id = resp[48:]
-    print("Peer ID:",to_hexstr(peer_id))
+    return sk
+
+def handle_peer_msgs(peer_sks):
+    print([peer_sk.recv[20] for peer_sk in peer_sks])
 
 def main():
     command = sys.argv[1]
@@ -191,6 +194,7 @@ def main():
         sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
         resp = sk.recv(80)
         peer_id = resp[48:]
+        sk.close()
         print("Peer ID:",to_hexstr(peer_id))
     elif command == "download_piece":
         btfile = None
@@ -220,9 +224,10 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
-        print("PEER_NUM",len(peers))
-        for peer in peers:
-            peer_handshake(peer,info_hash)
+        peer_sks = [peer_handshake(peer,info_hash) for peer in peers]
+        handle_peer_msgs(peer_sks)
+        for peer in peer_sks:
+            peer.close()
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
