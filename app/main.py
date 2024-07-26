@@ -187,7 +187,7 @@ def main():
         decoded = load_btfile_content(sys.argv[2])
         info_hash = make_hash(enc_bencode(decoded["info"]))
         sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
-        sk.connect(make_socket(sys.argv[3])
+        sk.connect(make_socket(sys.argv[3]))
         sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
         resp = sk.recv(80)
         peer_id = resp[48:]
