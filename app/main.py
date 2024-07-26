@@ -198,8 +198,9 @@ def main():
         outdir = None
         argc = 2
         argmax = len(sys.argv)
+        print(sys.argv)
+        print(v.encode() for v in sys.argv)
         while argc < argmax:
-            print("ARG",sys.argv[argc].encode())
             if sys.argv[argc].endswith(".torrent"):
                 btfile = sys.argv[argc]
             elif sys.argv[argc] == "-o":
