@@ -2,6 +2,7 @@ import json
 import sys
 import hashlib
 import socket as skt
+from random import choice
 
 # import bencodepy - available if you need it!
 import requests #- available if you need it!
@@ -147,11 +148,17 @@ def read_msg(peer):
     payload = peer.recv(int.from_bytes(msglen))
     return payload
 
-def handle_peer_msgs(peer_sks):
-    bitfields = [read_msg(peer) for peer in peer_sks]
-    for peer in peer_sks:
-        peer.send(b"\x00\x00\x00\x01\x02")
-    unchoked = [read_msg(peer) for per in peer_sks]
+def handle_peer_msgs(peer_sk):
+    while msg := read_msg(peer_sk):
+        if msg[4] == 5:
+            break
+    print("Bitfield is present")
+    peer_sk.send(b"\x00\x00\x00\x01\x02")
+    print("Sent interested message")
+    while msg := read_msg(peer_sk):
+        if msg[4] == 1:
+            break
+    print(msg)
 
 def main():
     command = sys.argv[1]
@@ -233,10 +240,9 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
-        peer_sks = [peer_handshake(peer,info_hash) for peer in peers]
-        handle_peer_msgs(peer_sks)
-        for peer in peer_sks:
-            peer.close()
+        peer_sk = peer_handshake(choice(peers))
+        handle_peer_msgs(peer_sk)
+        peer_sk.close()
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
