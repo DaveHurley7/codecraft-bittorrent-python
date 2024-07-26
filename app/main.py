@@ -150,14 +150,13 @@ def read_msg(peer):
 
 def handle_peer_msgs(peer_sk):
     while msg := read_msg(peer_sk):
-        print(msg)
-        if msg[4] == 5:
+        if msg[0] == 5:
             break
     print("Bitfield is present")
     peer_sk.send(b"\x00\x00\x00\x01\x02")
     print("Sent interested message")
     while msg := read_msg(peer_sk):
-        if msg[4] == 1:
+        if msg[0] == 1:
             break
     print(msg)
 
