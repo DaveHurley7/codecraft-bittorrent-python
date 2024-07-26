@@ -239,6 +239,8 @@ def main():
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
+        print("NUM PIECES:",len(decoded["info"]["pieces"])/20)
+        print("PIECE LEN:",decoded["info"]["piece_length"])
         peers = get_peer_list(tracker,info_hash,file_len)
         peer_sk = peer_handshake(choice(peers),info_hash)
         handle_peer_msgs(peer_sk)
