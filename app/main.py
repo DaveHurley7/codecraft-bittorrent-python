@@ -131,7 +131,7 @@ def load_btfile_content(filename):
     benc_content = file.read()
     file.close()
     decoded, _ = decode_bencode(benc_content)
-    return decode
+    return decoded
 
 def peer_handshake(peer):
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
@@ -195,17 +195,15 @@ def main():
     elif command == "download_piece":
         btfile = None
         piece_id = None
-        outdir = None
+        outfile = None
         argc = 2
         argmax = len(sys.argv)
-        print(sys.argv)
-        print([v.encode() for v in sys.argv])
         while argc < argmax:
             if sys.argv[argc].endswith(".torrent"):
                 btfile = sys.argv[argc]
             elif sys.argv[argc] == "-o":
                 argc += 1
-                outdir = sys.argv[argc]
+                outfile = sys.argv[argc]
             elif sys.argv[argc].isdigit():
                 piece_id = sys.argv[argc]
             else:
