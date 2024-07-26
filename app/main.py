@@ -240,7 +240,7 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
-        peer_sk = peer_handshake(choice(peers))
+        peer_sk = peer_handshake(choice(peers),info_hash)
         handle_peer_msgs(peer_sk)
         peer_sk.close()
     else:
