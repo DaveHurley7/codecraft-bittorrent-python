@@ -150,6 +150,7 @@ def read_msg(peer):
 
 def handle_peer_msgs(peer_sk):
     while msg := read_msg(peer_sk):
+        print(msg)
         if msg[4] == 5:
             break
     print("Bitfield is present")
