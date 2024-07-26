@@ -133,7 +133,7 @@ def load_btfile_content(filename):
     decoded, _ = decode_bencode(benc_content)
     return decoded
 
-def peer_handshake(peer):
+def peer_handshake(peer,info_hash):
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     sk.connect(peer)
     sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
@@ -221,7 +221,7 @@ def main():
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
         for peer in peers:
-            peer_handshake(peer)
+            peer_handshake(peer,info_hash)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
