@@ -199,7 +199,7 @@ def main():
         argc = 2
         argmax = len(sys.argv)
         print(sys.argv)
-        print(v.encode() for v in sys.argv)
+        print([v.encode() for v in sys.argv])
         while argc < argmax:
             if sys.argv[argc].endswith(".torrent"):
                 btfile = sys.argv[argc]
