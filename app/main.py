@@ -141,8 +141,16 @@ def peer_handshake(peer,info_hash):
     peer_id = resp[48:]
     return sk
 
+def read_msg(peer):
+    msglen = peer.recv(4)
+    payload = peer.recv(msglen)
+    return payload
+
 def handle_peer_msgs(peer_sks):
-    print([peer_sk.recv(20) for peer_sk in peer_sks])
+    bitfields = [read_msg(peer_sk) for peer_sk in peer_sks]
+    for peer in bitfields:
+        if peer[0] == 0x5:
+            print("Bitfield present")
 
 def main():
     command = sys.argv[1]
