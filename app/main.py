@@ -207,7 +207,7 @@ def main():
                 argc += 1
                 outdir = sys.argv[argc]
             elif sys.argv[argc].isdigit():
-                piece_id = None
+                piece_id = sys.argv[argc]
             else:
                 print("invalid argument: ", sys.argv[argc])
             argc += 1
