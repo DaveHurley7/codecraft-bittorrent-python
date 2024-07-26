@@ -142,7 +142,7 @@ def peer_handshake(peer,info_hash):
     return sk
 
 def handle_peer_msgs(peer_sks):
-    print([peer_sk.recv[20] for peer_sk in peer_sks])
+    print([peer_sk.recv(20) for peer_sk in peer_sks])
 
 def main():
     command = sys.argv[1]
