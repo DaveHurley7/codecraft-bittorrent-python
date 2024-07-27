@@ -191,7 +191,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         peer_sk.send(msg)
         pending.append(block_num)
         block_num += 1
-        if block_num == n_blocks && block_num < 5:
+        if block_num == n_blocks and block_num < 5:
             break
     while True:
         if len(pending) < MAX_REQUESTS and block_num < n_blocks:
