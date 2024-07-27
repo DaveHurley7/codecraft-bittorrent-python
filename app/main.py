@@ -194,7 +194,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         if block_num == n_blocks && block_num < 5:
             break
     while True:
-        if len(pending) < MAX_REQUESTS && block_num < n_blocks:
+        if len(pending) < MAX_REQUESTS and block_num < n_blocks:
             msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
                     b""+piece_id.to_bytes(4)+b""
                     b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
