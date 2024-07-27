@@ -144,22 +144,87 @@ def peer_handshake(peer,info_hash):
 
 def read_msg(peer):
     msglen = peer.recv(4)
-    print("NEW MSG LEN:",msglen)
     payload = peer.recv(int.from_bytes(msglen))
     return payload
 
-def handle_peer_msgs(peer_sk):
-    while msg := read_msg(peer_sk):
-        if msg[0] == 5:
-            break
-    print("Bitfield is present")
-    peer_sk.send(b"\x00\x00\x00\x01\x02")
-    print("Sent interested message")
-    while msg := read_msg(peer_sk):
-        if msg[0] == 1:
-            break
-    print(msg)
+MAX_BLOCK_SIZE = 0x4000
+MAX_REQUESTS = 5
 
+class MsgId:
+    Choke = b"\x00"
+    Unchoke = b"\x01"
+    Interested = b"\0x02"
+    Not_Interested = b"\x03"
+    Have = b"\x04"
+    Bitfield = b"\x05"
+    Request = b"\x06"
+    Piece = b"\x07"
+    Cancel = b"\x08"
+    
+def last_block(block_num,n_blocks,last_size):
+    if block_num + 1 != n_blocks:
+        return False
+    if not last_size:
+        return False
+    return True
+
+def handle_peer_msgs(peer_sk, piece_id, piecelen):
+    while msg := read_msg(peer_sk):
+        if msg[0] == MsgId.Bitfield:
+            break
+    peer_sk.send(b"\x00\x00\x00\x01"+MsgId.Interested)
+    while msg := read_msg(peer_sk):
+        if msg[0] == MsgId.Unchoke:
+            break
+    last_block_size = piecelen % MAX_BLOCK_SIZE
+    n_blocks = piecelen // MAX_BLOCK_SIZE
+    if last_block_size:
+        n_blocks += 1
+    blocks_received = [None]*n_blocks
+    pending = []
+    block_num = 0
+    while block_num < 5:
+        msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
+              b""+piece_id.to_bytes(4)+b""
+              b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
+              b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE)+b"")
+        peer_sk.send(msg)
+        pending.append(block_num)
+        block_num += 1
+        if block_num == n_blocks && block_num < 5:
+            break
+    while True:
+        if len(pending) < MAX_REQUESTS && block_num < n_blocks:
+            msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
+                    b""+piece_id.to_bytes(4)+b""
+                    b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
+                    b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE)+b"")
+            peer_sk.send(msg)
+            pending.append(block_num)
+            block_num += 1    
+        if not pending:
+            break
+        msg = read_msg(peer_sk)
+        if msg[0] == MsgId.Piece:
+            resp_piece = int.from_bytes(msg[1:5])
+            offset = int.from_bytes(msg[5:9])
+            data = int.from_bytes(msg[9:13])
+            block_id = offset // MAX_BLOCK_SIZE
+            blocks_received[block_id] == data
+            pending.remove(block_id)
+    
+def download_piece(peer_sk,piece_id,decoded,piece_hash,outfile):
+    blocks = handle_peer_msgs(peer_sk,piece_id,decoded["info"]["piece length"])
+    hasher = hashlib.sha1()
+    for block in blocks:
+        hasher.update(block)
+    if piece_hash != hasher.digest():
+        print("Received piece doesn't match any piece hashes")
+    btfile = open(outfile,"wb")
+    for block in blocks:
+        btfile.write(block)
+    btfile.close()
+    
 def main():
     command = sys.argv[1]
 
@@ -225,7 +290,7 @@ def main():
                 argc += 1
                 outfile = sys.argv[argc]
             elif sys.argv[argc].isdigit():
-                piece_id = sys.argv[argc]
+                piece_id = int(sys.argv[argc])
             else:
                 print("invalid argument: ", sys.argv[argc])
             argc += 1
@@ -243,7 +308,8 @@ def main():
         print("PIECE LEN:",decoded["info"]["piece length"])
         peers = get_peer_list(tracker,info_hash,file_len)
         peer_sk = peer_handshake(choice(peers),info_hash)
-        handle_peer_msgs(peer_sk)
+        piece_start = piece_id*20
+        download_piece(peer_sk,piece_id,decoded["info"]["piece length"],decoded["info"]["pieces"][(piece_start:piece_start+20)],outfile) 
         peer_sk.close()
     else:
         raise NotImplementedError(f"Unknown command {command}")
