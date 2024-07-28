@@ -298,7 +298,7 @@ def main():
         if not btfile:
             print("No .torrent file provided")
             quit(1)
-        if isintance(piece_id,int):
+        if not isinstance(piece_id,int):
             print("A piece must be specified")
             quit(1)
         #quit(1)
