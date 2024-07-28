@@ -213,8 +213,8 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             blocks_received[block_id] == data
             pending.remove(block_id)
     
-def download_piece(peer_sk,piece_id,decoded,piece_hash,outfile):
-    blocks = handle_peer_msgs(peer_sk,piece_id,decoded["info"]["piece length"])
+def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
+    blocks = handle_peer_msgs(peer_sk,piece_id,piecelen)
     hasher = hashlib.sha1()
     for block in blocks:
         hasher.update(block)
@@ -298,7 +298,7 @@ def main():
         if not btfile:
             print("No .torrent file provided")
             quit(1)
-        if not piece_id:
+        if isintance(piece_id,int):
             print("A piece must be specified")
             quit(1)
         #quit(1)
