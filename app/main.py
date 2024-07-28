@@ -143,6 +143,7 @@ def peer_handshake(peer,info_hash):
     return sk
 
 def read_msg(peer):
+    print("GETTING MSG LEN")
     msglen = peer.recv(4)
     print("PEER MSGLEN:",msglen)
     payload = peer.recv(int.from_bytes(msglen))
