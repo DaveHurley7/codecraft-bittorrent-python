@@ -301,7 +301,7 @@ def main():
         if not piece_id:
             print("A piece must be specified")
             quit(1)
-        quit(1)
+        #quit(1)
         decoded = load_btfile_content(btfile)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
