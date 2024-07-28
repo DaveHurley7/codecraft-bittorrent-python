@@ -173,6 +173,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         print(msg)
         if msg[0] == MsgId.Bitfield:
+            print("Have bitfield")
             break
     peer_sk.send(b"\x00\x00\x00\x01"+MsgId.Interested)
     print("Interested")
