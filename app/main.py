@@ -204,6 +204,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_num += 1    
         if not pending:
             break
+        print("Waiting for mesage")
         msg = read_msg(peer_sk)
         if msg[0] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
@@ -283,7 +284,6 @@ def main():
         outfile = None
         argc = 2
         argmax = len(sys.argv)
-        print("ARGS",sys.argv)
         while argc < argmax:
             if sys.argv[argc].endswith(".torrent"):
                 btfile = sys.argv[argc]
@@ -306,8 +306,6 @@ def main():
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
-        print("NUM PIECES:",len(decoded["info"]["pieces"])/20)
-        print("PIECE LEN:",decoded["info"]["piece length"])
         peers = get_peer_list(tracker,info_hash,file_len)
         peer_sk = peer_handshake(choice(peers),info_hash)
         piece_start = piece_id*20
