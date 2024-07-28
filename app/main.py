@@ -144,7 +144,9 @@ def peer_handshake(peer,info_hash):
 
 def read_msg(peer):
     msglen = peer.recv(4)
+    print("PEER MSGLEN:",msglen)
     payload = peer.recv(int.from_bytes(msglen))
+    print("PEER DATA:",payload)
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
@@ -169,11 +171,9 @@ def last_block(block_num,n_blocks,last_size):
     return True
 
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
-    print("Waiting")
     while msg := read_msg(peer_sk):
         print(msg,MsgId.Bitfield,msg[0])
         if msg[0:1] == MsgId.Bitfield:
-            print("Have bitfield")
             break
     peer_sk.send(b"\x00\x00\x00\x01"+MsgId.Interested)
     print("Interested")
