@@ -178,6 +178,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     peer_sk.send(b"\x00\x00\x00\x01"+MsgId.Interested)
     print("Interested")
     while msg := read_msg(peer_sk):
+        print(msg[0:1], MsgId.Unchoke)
         if msg[0:1] == MsgId.Unchoke:
             break
     print("Setting up blocks")
