@@ -178,7 +178,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             break
     interested_msg = b"\x00\x00\x00\x01"+MsgId.Interested
     peer_sk.sendall(interested_msg)
-    print("Interested")
+    print("Interested",interested_msg)
     while msg := read_msg(peer_sk):
         print(msg[0:1], MsgId.Unchoke)
         if msg[0:1] == MsgId.Unchoke:
