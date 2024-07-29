@@ -170,12 +170,10 @@ def last_block(block_num,n_blocks,last_size):
 
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
-        print(msg,MsgId.Bitfield,msg[0])
         if msg[0:1] == MsgId.Bitfield:
             break
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
-        print(msg[0:1], MsgId.Unchoke)
         if msg[0:1] == MsgId.Unchoke:
             break
     print("Setting up blocks")
@@ -211,7 +209,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             break
         print("Waiting for mesage")
         msg = read_msg(peer_sk)
-        if msg[0] == MsgId.Piece:
+        if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
             data = int.from_bytes(msg[9:13])
