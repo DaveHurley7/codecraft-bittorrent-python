@@ -156,7 +156,7 @@ MAX_REQUESTS = 5
 class MsgId:
     Choke = b"\x00"
     Unchoke = b"\x01"
-    Interested = b"\0x02"
+    Interested = b"\x02"
     Not_Interested = b"\x03"
     Have = b"\x04"
     Bitfield = b"\x05"
