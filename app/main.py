@@ -202,7 +202,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
                     b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE).to_bytes(4)+b"")
             peer_sk.sendall(msg)
             pending.append(block_num)
-            print("DATA BLOCK",block_id,"ADDED")
+            print("DATA BLOCK",block_num,"ADDED")
             block_num += 1    
         if not pending:
             break
