@@ -201,7 +201,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         block_num += 1
         if block_num == n_blocks and block_num < 5:
             break
-    print("FIrst five sent")
+    print("First five sent")
     while True:
         if len(pending) < MAX_REQUESTS and block_num < n_blocks:
             msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
