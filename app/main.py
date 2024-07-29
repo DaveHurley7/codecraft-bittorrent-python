@@ -176,7 +176,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         print(msg,MsgId.Bitfield,msg[0])
         if msg[0:1] == MsgId.Bitfield:
             break
-    peer_sk.send(b"\x00\x00\x00\x01"+MsgId.Interested)
+    peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     print("Interested")
     while msg := read_msg(peer_sk):
         print(msg[0:1], MsgId.Unchoke)
@@ -196,7 +196,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
               b""+piece_id.to_bytes(4)+b""
               b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
               b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE)+b"")
-        peer_sk.send(msg)
+        peer_sk.sendall(msg)
         pending.append(block_num)
         block_num += 1
         if block_num == n_blocks and block_num < 5:
@@ -208,7 +208,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
                     b""+piece_id.to_bytes(4)+b""
                     b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
                     b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE)+b"")
-            peer_sk.send(msg)
+            peer_sk.sendall(msg)
             pending.append(block_num)
             block_num += 1    
         if not pending:
