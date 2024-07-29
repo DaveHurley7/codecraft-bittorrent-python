@@ -193,7 +193,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         block_num += 1
         if block_num == n_blocks and block_num < 5:
             break
-    print("First five sent")
     while True:
         if len(pending) < MAX_REQUESTS and block_num < n_blocks:
             msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
@@ -206,9 +205,8 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_num += 1    
         if not pending:
             break
-        print("Waiting for mesage")
-        print("REQ_LEN:",len(pending))
         msg = read_msg(peer_sk)
+        print(msg[:5])
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
