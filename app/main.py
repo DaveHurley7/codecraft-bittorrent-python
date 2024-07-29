@@ -176,7 +176,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
-    print("Setting up blocks")
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
@@ -184,7 +183,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     blocks_received = [None]*n_blocks
     pending = []
     block_num = 0
-    print("Sending first five blocks")
     while block_num < 5:
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
@@ -208,13 +206,14 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         if not pending:
             break
         print("Waiting for mesage")
+        print("REQ_LEN:",len(pending))
         msg = read_msg(peer_sk)
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
             data = int.from_bytes(msg[9:13])
             block_id = offset // MAX_BLOCK_SIZE
-            blocks_received[block_id] == data
+            blocks_received[block_id] = data
             pending.remove(block_id)
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
@@ -304,7 +303,6 @@ def main():
         if not isinstance(piece_id,int):
             print("A piece must be specified")
             quit(1)
-        #quit(1)
         decoded = load_btfile_content(btfile)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
