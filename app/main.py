@@ -185,6 +185,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     if last_block_size:
         n_blocks += 1
     blocks_received = [None]*n_blocks
+    print("NUM BLOCKS",n_blocks)
     pending = []
     block_num = 0
     print("Blocks prepared")
@@ -211,7 +212,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         if not pending:
             break
         msg = read_msg(peer_sk)
-        print(msg[:5])
+        #print(msg[:5])
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
