@@ -143,6 +143,7 @@ def peer_handshake(peer,info_hash):
     return sk
 
 def read_msg(peer):
+    print("Waiting for message")
     msglen = int.from_bytes(peer.recv(4))
     payload = b""
     while len(payload) < msglen:
