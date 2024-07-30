@@ -206,6 +206,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
               b""+block_size.to_bytes(4)+b"")
         peer_sk.sendall(msg)
         pending.append(block_num)
+        print("REQUESTED BLOCK",block_num)
         block_num += 1
         if block_num == n_blocks and block_num < 5:
             break
@@ -220,6 +221,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             print("REQUEST MSG",msg)
             peer_sk.sendall(msg)
             pending.append(block_num)
+            print("REQUESTED BLOCK",block_num)
             block_num += 1    
         if not pending:
             break
@@ -231,6 +233,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_id = offset // MAX_BLOCK_SIZE
             blocks_received[block_id] = data
             pending.remove(block_id)
+            print("REMOVE BLOCK",block_id)
     return blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
