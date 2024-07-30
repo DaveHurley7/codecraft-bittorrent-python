@@ -153,6 +153,8 @@ def peer_handshake(peer,info_hash):
 
 def read_msg(peer):
     d_in = peer.recv(4)
+    if not d_in:
+        return b""
     print("MSGLEN",d_in)
     msglen = int.from_bytes(d_in)
     payload = b""
@@ -226,8 +228,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_num += 1    
         if not pending:
             break
-        else:
-            print("PENDING",pending)
         msg = read_msg(peer_sk)
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
