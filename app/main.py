@@ -150,6 +150,10 @@ def read_msg(peer):
     while len(payload) < msglen:
         payload += peer.recv(msglen)
         print("Adding more to payload",len(payload))
+        if len(payload) > msglen:
+            extra = payload[msglen:]
+            payload = payload[:msglen]
+            print("Extra",extra[:9])
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
