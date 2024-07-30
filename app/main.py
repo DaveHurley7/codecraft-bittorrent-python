@@ -159,7 +159,6 @@ def read_msg(peer):
     while len(payload) < msglen:
         payload += peer.recv(msglen - len_recv)
         len_recv = len(payload)
-        print("Adding more to payload",len(payload))
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
@@ -178,12 +177,9 @@ class MsgId:
     
 def last_block(block_num,n_blocks,last_size):
     if block_num + 1 != n_blocks:
-        print("Not on last block",block_num,n_blocks)
         return False
     if not last_size:
-        print("Last same size as rest",block_num,n_blocks)
         return False
-    print("On last, different size")
     return True
 
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
