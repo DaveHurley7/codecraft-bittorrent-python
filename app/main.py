@@ -199,10 +199,12 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     block_num = 0
     print("Blocks prepared")
     while block_num < 5:
+        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
+        print("Requesting",block_size,"bytes")
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
               b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
-              b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE).to_bytes(4)+b"")
+              b""+block_size.to_bytes(4)+b"")
         peer_sk.sendall(msg)
         pending.append(block_num)
         block_num += 1
