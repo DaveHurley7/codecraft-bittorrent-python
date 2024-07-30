@@ -187,18 +187,16 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
             break
+    print("BITFIELD:",msg)
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
     last_block_size = piecelen % MAX_BLOCK_SIZE
-    print("Last block size:",last_block_size)
-    print("MAX BLOCK SIZE",MAX_BLOCK_SIZE)
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
         n_blocks += 1
     blocks_received = [None]*n_blocks
-    print("NUM BLOCKS",n_blocks)
     pending = []
     block_num = 0
     while block_num < 5:
@@ -222,12 +220,10 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
                     b""+block_size.to_bytes(4)+b"")
             peer_sk.sendall(msg)
             pending.append(block_num)
-            print("DATA BLOCK",block_num,"ADDED")
             block_num += 1    
         if not pending:
             break
         msg = read_msg(peer_sk)
-        print("Have message",msg[:9])
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
@@ -235,7 +231,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_id = offset // MAX_BLOCK_SIZE
             blocks_received[block_id] = data
             pending.remove(block_id)
-            print("DATA BLOCK",block_id,"REMOVED")
     return blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
