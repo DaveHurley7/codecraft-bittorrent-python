@@ -156,10 +156,6 @@ def read_msg(peer):
         payload += peer.recv(msglen - len_recv)
         len_recv = len(payload)
         print("Adding more to payload",len(payload))
-        if len(payload) > msglen:
-            extra = payload[msglen:]
-            payload = payload[:msglen]
-            print("Extra",extra[:13])
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
@@ -189,11 +185,11 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
             break
-    print("BITFIELD:",msg)
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
+    print("Total piece length",piecelen)
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
