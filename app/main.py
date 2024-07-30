@@ -177,8 +177,9 @@ def last_block(block_num,n_blocks,last_size):
         print("Not on last block",block_num,n_blocks)
         return False
     if not last_size:
-        print()
+        print("Last same size as rest",block_num,n_blocks)
         return False
+    print("On last, different size")
     return True
 
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
