@@ -215,7 +215,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         if not pending:
             break
         msg = read_msg(peer_sk)
-        print("Have message",msg[:1])
+        print("Have message",msg[:9])
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
