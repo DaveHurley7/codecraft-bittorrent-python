@@ -217,6 +217,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
                     b""+piece_id.to_bytes(4)+b""
                     b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
                     b""+block_size.to_bytes(4)+b"")
+            print("REQUEST MSG",msg)
             peer_sk.sendall(msg)
             pending.append(block_num)
             block_num += 1    
