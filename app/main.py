@@ -312,6 +312,7 @@ def main():
         peers = get_peer_list(tracker,info_hash,file_len)
         peer_sk = peer_handshake(choice(peers),info_hash)
         piece_start = piece_id*20
+        print("Attempting to download piece",piece_id)
         download_piece(peer_sk,piece_id,decoded["info"]["piece length"],decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
         peer_sk.close()
     else:
