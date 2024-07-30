@@ -139,13 +139,13 @@ def peer_handshake(peer,info_hash):
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     sk.connect(peer)
     sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
-    waittime = 4
+    waittime = 5
     while True:
         try:
             resp = sk.recv(68)
             break
         except ConnectionResetError:
-            print("Reset error, trying again. Sleep time:",waittime)
+            print("Reset error, trying again. Sleep time:",waittime,"seconds")
             sleep(waittime)
             waittime **= 2
     peer_id = resp[48:]
