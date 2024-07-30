@@ -146,7 +146,7 @@ def read_msg(peer):
     msglen = int.from_bytes(peer.recv(4))
     payload = b""
     while len(payload) < msglen:
-        peer.recv(msglen)
+        payload += peer.recv(msglen)
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
