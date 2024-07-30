@@ -154,6 +154,7 @@ def peer_handshake(peer,info_hash):
 def read_msg(peer):
     d_in = peer.recv(4)
     if not d_in:
+        print(peer.get_peer_name())
         return b""
     print("MSGLEN",d_in)
     msglen = int.from_bytes(d_in)
