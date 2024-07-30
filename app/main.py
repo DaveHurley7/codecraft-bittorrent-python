@@ -145,10 +145,11 @@ def peer_handshake(peer,info_hash):
 def read_msg(peer):
     print("Waiting for message")
     msglen = int.from_bytes(peer.recv(4))
+    print("Msg Len:",msglen)
     payload = b""
     while len(payload) < msglen:
         payload += peer.recv(msglen)
-        print("Adding more to payload")
+        print("Adding more to payload",len(payload))
     return payload
 
 MAX_BLOCK_SIZE = 0x4000
