@@ -3,7 +3,7 @@ import sys
 import hashlib
 import socket as skt
 from random import choice
-import sleep
+from time import sleep
 
 # import bencodepy - available if you need it!
 import requests #- available if you need it!
