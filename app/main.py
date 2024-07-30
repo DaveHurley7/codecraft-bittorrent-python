@@ -149,8 +149,10 @@ def read_msg(peer):
     msglen = int.from_bytes(d_in)
     print("Msg Len:",msglen)
     payload = b""
+    len_recv = 0
     while len(payload) < msglen:
-        payload += peer.recv(msglen)
+        payload += peer.recv(msglen - len_recv)
+        len_recv = len(payload)
         print("Adding more to payload",len(payload))
         if len(payload) > msglen:
             extra = payload[msglen:]
