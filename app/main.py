@@ -185,12 +185,10 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
             break
-    print("Bitfield received")
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
-    print("Interested and unchoked")
     last_block_size = piecelen % MAX_BLOCK_SIZE
     print("Last block size:",last_block_size)
     print("MAX BLOCK SIZE",MAX_BLOCK_SIZE)
@@ -201,10 +199,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     print("NUM BLOCKS",n_blocks)
     pending = []
     block_num = 0
-    print("Blocks prepared")
     while block_num < 5:
-        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
-        print("Requesting",block_size,"bytes")
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
               b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
@@ -216,10 +211,12 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             break
     while True:
         if len(pending) < MAX_REQUESTS and block_num < n_blocks:
+            block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
+            print("Requesting",block_size,"bytes")
             msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
                     b""+piece_id.to_bytes(4)+b""
                     b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
-                    b""+(last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE).to_bytes(4)+b"")
+                    b""+block_size.to_bytes(4)+b"")
             peer_sk.sendall(msg)
             pending.append(block_num)
             print("DATA BLOCK",block_num,"ADDED")
