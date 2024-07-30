@@ -227,7 +227,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         if msg[0:1] == MsgId.Piece:
             resp_piece = int.from_bytes(msg[1:5])
             offset = int.from_bytes(msg[5:9])
-            data = int.from_bytes(msg[9:13])
+            data = msg[9:]
             block_id = offset // MAX_BLOCK_SIZE
             blocks_received[block_id] = data
             pending.remove(block_id)
