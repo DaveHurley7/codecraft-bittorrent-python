@@ -174,10 +174,12 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
             break
+    print("Bitfield received")
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
+    print("Interested and unchoked")
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
@@ -185,6 +187,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     blocks_received = [None]*n_blocks
     pending = []
     block_num = 0
+    print("Blocks prepared")
     while block_num < 5:
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
