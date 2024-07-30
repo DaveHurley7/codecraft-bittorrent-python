@@ -145,7 +145,7 @@ def peer_handshake(peer,info_hash):
 def read_msg(peer):
     print("Waiting for message")
     d_in = peer.recv(4)
-    print(d_in)
+    print("Msglen bytes",d_in)
     msglen = int.from_bytes(d_in)
     print("Msg Len:",msglen)
     payload = b""
@@ -174,8 +174,10 @@ class MsgId:
     
 def last_block(block_num,n_blocks,last_size):
     if block_num + 1 != n_blocks:
+        print("Not on last block",block_num,n_blocks)
         return False
     if not last_size:
+        print()
         return False
     return True
 
