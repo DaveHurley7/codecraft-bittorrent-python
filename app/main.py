@@ -190,6 +190,8 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             break
     print("Interested and unchoked")
     last_block_size = piecelen % MAX_BLOCK_SIZE
+    print("Last block size:",last_block_size)
+    print("MAX BLOCK SIZE",MAX_BLOCK_SIZE)
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
         n_blocks += 1
