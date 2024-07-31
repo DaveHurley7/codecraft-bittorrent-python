@@ -128,8 +128,7 @@ class ReconnectableSocket:
             resp = self.sk.recv(length)
             if resp:
                 return resp
-            self.sk.connect(self.addr)
-            
+            self.sk.connect(self.info)
 
 def make_socket(csk_info):
     host, port = csk_info.split(":")
