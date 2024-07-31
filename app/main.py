@@ -128,7 +128,7 @@ class ReconnectableSocket:
             resp = self.sk.recv(length)
             if resp:
                 return resp
-            self.sk.connect(addr)
+            self.sk.connect(self.addr)
             
 
 def make_socket(csk_info):
