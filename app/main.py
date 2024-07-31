@@ -128,7 +128,7 @@ class ReconnectableSocket:
             resp = self.sk.recv(length)
             if resp:
                 return resp
-            print("RESP:",resp)
+            print("RESP:",resp,self.sk.getpeername())
             self.sk.connect(self.info)
 
 def make_socket(csk_info):
@@ -136,7 +136,7 @@ def make_socket(csk_info):
     return host, int(port)
 
 def to_hexstr(valstr):
-    vals = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"]
+    vals = "012345679abcdef"
     hexstr = ""
     for b in valstr:
         fbyte = b >> 4
