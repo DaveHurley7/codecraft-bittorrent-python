@@ -115,6 +115,22 @@ def get_peer_list(tracker_url,info_hash,file_len):
     peer_list = extract_peers(content[0]["peers"])
     return peer_list
 
+class ReconnectableSocket:
+    def __init__(self,socket,addr):
+        self.sk = socket
+        self.info = addr
+        
+    def sendall(self,message):
+        self.sk.sendall(message)
+        
+    def recv(self,length):
+        while True:
+            resp = self.sk.recv(length)
+            if resp:
+                return resp
+            self.sk.connect(addr)
+            
+
 def make_socket(csk_info):
     host, port = csk_info.split(":")
     return host, int(port)
@@ -138,7 +154,7 @@ def load_btfile_content(filename):
 def peer_handshake(peer,info_hash):
     sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
     sk.connect(peer)
-    sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
+    sk.sendall(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
     waittime = 5
     while True:
         try:
@@ -149,13 +165,10 @@ def peer_handshake(peer,info_hash):
             sleep(waittime)
             waittime **= 2
     peer_id = resp[48:]
-    return sk
+    return ReconnectableSocket(sk,peer)
 
 def read_msg(peer):
     d_in = peer.recv(4)
-    if not d_in:
-        print(peer.getpeername())
-        return b""
     print("MSGLEN",d_in)
     msglen = int.from_bytes(d_in)
     payload = b""
@@ -299,7 +312,7 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         sk = skt.socket(skt.AF_INET,skt.SOCK_STREAM)
         sk.connect(make_socket(sys.argv[3]))
-        sk.send(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
+        sk.sendall(b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"+info_hash+b"00112233445566778899")
         resp = sk.recv(80)
         peer_id = resp[48:]
         sk.close()
@@ -332,7 +345,8 @@ def main():
         info_hash = make_hash(enc_bencode(decoded["info"]))
         file_len = decoded["info"]["length"]
         peers = get_peer_list(tracker,info_hash,file_len)
-        peer_sk = peer_handshake(choice(peers),info_hash)
+        peer_info = choice(peers)
+        peer_sk = peer_handshake(peer_info,info_hash)
         piece_start = piece_id*20
         print("Attempting to download piece",piece_id)
         download_piece(peer_sk,piece_id,decoded["info"]["piece length"],decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
