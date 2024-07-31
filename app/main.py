@@ -130,6 +130,9 @@ class ReconnectableSocket:
                 return resp
             print("RESP:",resp,self.sk.getpeername())
             self.sk.connect(self.info)
+            
+    def close(self):
+        self.sk.close()
 
 def make_socket(csk_info):
     host, port = csk_info.split(":")
