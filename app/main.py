@@ -129,7 +129,7 @@ class ReconnectableSocket:
             if resp:
                 return resp
             sleep(2)
-            print("RESP:",resp,self.sk.getpeername())
+            #print("RESP:",resp,self.sk.getpeername())
             self.sk.connect(self.info)
             
     def close(self):
