@@ -129,8 +129,8 @@ class ReconnectableSocket:
             if resp:
                 return resp
             sleep(2)
-            #print("RESP:",resp,self.sk.getpeername())
-            self.sk.connect(self.info)
+            if not self.sk.getpeername():
+                self.sk.connect(self.info)
             
     def close(self):
         self.sk.close()
@@ -173,7 +173,7 @@ def peer_handshake(peer,info_hash):
 
 def read_msg(peer):
     d_in = peer.recv(4)
-    print("MSGLEN",d_in)
+    #print("MSGLEN",d_in)
     msglen = int.from_bytes(d_in)
     payload = b""
     len_recv = 0
@@ -211,7 +211,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
-    print("Total piece length",piecelen)
+    #print("Total piece length",piecelen)
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
@@ -227,7 +227,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
               b""+block_size.to_bytes(4)+b"")
         peer_sk.sendall(msg)
         pending.append(block_num)
-        print("REQUESTED BLOCK",block_num)
+        #print("REQUESTED BLOCK",block_num)
         block_num += 1
         if block_num == n_blocks and block_num < 5:
             break
@@ -239,10 +239,10 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
                     b""+piece_id.to_bytes(4)+b""
                     b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
                     b""+block_size.to_bytes(4)+b"")
-            print("REQUEST MSG",msg)
+            #print("REQUEST MSG",msg)
             peer_sk.sendall(msg)
             pending.append(block_num)
-            print("REQUESTED BLOCK",block_num)
+            #print("REQUESTED BLOCK",block_num)
             block_num += 1    
         if not pending:
             break
@@ -254,7 +254,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_id = offset // MAX_BLOCK_SIZE
             blocks_received[block_id] = data
             pending.remove(block_id)
-            print("REMOVE BLOCK",block_id)
+            #print("REMOVE BLOCK",block_id)
     return blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
