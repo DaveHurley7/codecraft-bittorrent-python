@@ -279,16 +279,14 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     return piece_content #blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
-    blocks = handle_peer_msgs(peer_sk,piece_id,piecelen)
+    content = handle_peer_msgs(peer_sk,piece_id,piecelen)
     hasher = hashlib.sha1()
     print("DATA TYPE IS",type(blocks[0]))
-    for block in blocks:
-        hasher.update(block)
+    hasher.update(content)
     if piece_hash != hasher.digest():
         print("Received piece doesn't match any piece hashes")
     btfile = open(outfile,"wb")
-    for block in blocks:
-        btfile.write(block)
+    btfile.write(content)
     btfile.close()
     
 def main():
