@@ -238,7 +238,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             offset = int.from_bytes(msg[5:9])
             data = msg[9:]
             piece_content += msg[9:]
-        print("Done block",blkn)
+        print("Downloaded",len(piece_content),"of",piece_len)
     """    
     while block_num < 5:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
