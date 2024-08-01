@@ -128,13 +128,12 @@ class ReconnectableSocket:
             resp = self.sk.recv(length)
             if resp:
                 return resp
-            print("RESP EMPTY")
             sleep(2)
-            print("TRYING AGAIN")
             
-            #try:
-             #   self.sk.getpeername()
-            #except OSError:
+            try:
+                self.sk.getpeername()
+            except OSError as ose:
+                print("ERROR",ose.strerror)
                 #self.sk.detach()
              #   self.sk.connect(self.info)
             
