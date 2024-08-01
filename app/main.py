@@ -226,7 +226,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     #pending = []
     #block_num = 0
     for blkn in range(n_blocks):
-        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
+        block_size = last_block_size if last_block(blkn,n_blocks,last_block_size) else MAX_BLOCK_SIZE
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
               b""+(blkn*MAX_BLOCK_SIZE).to_bytes(4)+b""
