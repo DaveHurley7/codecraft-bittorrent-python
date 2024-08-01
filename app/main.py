@@ -130,7 +130,7 @@ class ReconnectableSocket:
                 return resp
             sleep(2)
             try:
-                self.sk.getpeername():
+                self.sk.getpeername()
             except OSError:
                 self.sk.connect(self.info)
             
