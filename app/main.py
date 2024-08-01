@@ -275,7 +275,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             blocks_received[block_id] = data
             pending.remove(block_id)
             #print("REMOVE BLOCK",block_id)"""
-    return piece_contetn #blocks_received
+    return piece_content #blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
     blocks = handle_peer_msgs(peer_sk,piece_id,piecelen)
