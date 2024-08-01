@@ -221,9 +221,24 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
         n_blocks += 1
-    blocks_received = [None]*n_blocks
-    pending = []
-    block_num = 0
+    #blocks_received = [] [None]*n_blocks
+    piece_content = b""
+    #pending = []
+    #block_num = 0
+    for blkn in range(n_blocks):
+        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
+        msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
+              b""+piece_id.to_bytes(4)+b""
+              b""+(blkn*MAX_BLOCK_SIZE).to_bytes(4)+b""
+              b""+block_size.to_bytes(4)+b"")
+        peer_sk.sendall(msg)
+        msg = read_msg(peer_sk)
+        if msg[0:1] == MsgId.Piece:
+            resp_piece = int.from_bytes(msg[1:5])
+            offset = int.from_bytes(msg[5:9])
+            data = msg[9:]
+            piece_content += msg[9:]
+    """    
     while block_num < 5:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
@@ -259,8 +274,8 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_id = offset // MAX_BLOCK_SIZE
             blocks_received[block_id] = data
             pending.remove(block_id)
-            #print("REMOVE BLOCK",block_id)
-    return blocks_received
+            #print("REMOVE BLOCK",block_id)"""
+    return piece_contetn #blocks_received
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
     blocks = handle_peer_msgs(peer_sk,piece_id,piecelen)
