@@ -132,7 +132,7 @@ class ReconnectableSocket:
             try:
                 self.sk.getpeername()
             except OSError:
-                self.sk.detach()
+                #self.sk.detach()
                 self.sk.connect(self.info)
             
     def close(self):
