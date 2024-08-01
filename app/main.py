@@ -124,18 +124,7 @@ class ReconnectableSocket:
         self.sk.sendall(message)
         
     def recv(self,length):
-        while True:
-            resp = self.sk.recv(length)
-            if resp:
-                return resp
-            sleep(2)
-            
-            try:
-                self.sk.getpeername()
-            except OSError as ose:
-                print("ERROR",ose.strerror)
-                #self.sk.detach()
-             #   self.sk.connect(self.info)
+        return self.sk.recv(length)
             
     def close(self):
         self.sk.close()
@@ -238,7 +227,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             offset = int.from_bytes(msg[5:9])
             data = msg[9:]
             piece_content += msg[9:]
-        print("Downloaded",len(piece_content),"of",piecelen)
+            print("Downloaded",len(piece_content),"of",piecelen)
     """    
     while block_num < 5:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
