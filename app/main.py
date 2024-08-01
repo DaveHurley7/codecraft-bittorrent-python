@@ -129,7 +129,9 @@ class ReconnectableSocket:
             if resp:
                 return resp
             sleep(2)
-            if not self.sk.getpeername():
+            try:
+                self.sk.getpeername():
+            except OSError:
                 self.sk.connect(self.info)
             
     def close(self):
