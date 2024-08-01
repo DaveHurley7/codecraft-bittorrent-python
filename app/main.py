@@ -213,13 +213,13 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     #blocks_received = [] [None]*n_blocks
     piece_content = b""
     #pending = []
-    #block_num = 0
+    block_num = 0
     print("Amount of blocks:",n_blocks)
-    for blkn in range(n_blocks):
-        block_size = last_block_size if last_block(blkn,n_blocks,last_block_size) else MAX_BLOCK_SIZE
+    while block_num < n_blocks:
+        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
               b""+piece_id.to_bytes(4)+b""
-              b""+(blkn*MAX_BLOCK_SIZE).to_bytes(4)+b""
+              b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
               b""+block_size.to_bytes(4)+b"")
         peer_sk.sendall(msg)
         msg = read_msg(peer_sk)
@@ -228,7 +228,9 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             offset = int.from_bytes(msg[5:9])
             data = msg[9:]
             piece_content += msg[9:]
+            block_num += 1
             print("Downloaded",len(piece_content),"of",piecelen)
+            
     """    
     while block_num < 5:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
