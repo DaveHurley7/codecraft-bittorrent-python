@@ -281,6 +281,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
     blocks = handle_peer_msgs(peer_sk,piece_id,piecelen)
     hasher = hashlib.sha1()
+    print("DATA TYPE IS",type(blocks[0]))
     for block in blocks:
         hasher.update(block)
     if piece_hash != hasher.digest():
