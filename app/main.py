@@ -116,9 +116,10 @@ def get_peer_list(tracker_url,info_hash,file_len):
     return peer_list
 
 class ReconnectableSocket:
-    def __init__(self,socket,addr):
+    def __init__(self,socket,addr,info_hash):
         self.sk = socket
         self.info = addr
+        self.info_hash = info_hash
         
     def sendall(self,message):
         self.sk.sendall(message)
@@ -163,7 +164,7 @@ def peer_handshake(peer,info_hash):
             sleep(waittime)
             waittime **= 2
     peer_id = resp[48:]
-    return ReconnectableSocket(sk,peer)
+    return ReconnectableSocket(sk,peer,info_hash)
 
 def read_msg(peer):
     d_in = peer.recv(4)
@@ -230,6 +231,11 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             piece_content += msg[9:]
             block_num += 1
             print("Downloaded",len(piece_content),"of",piecelen)
+        if not msg:
+            peer_info = peer_sk.info
+            info_hash = peer_sk.info_hash
+            peer_sk.close()
+            peer_sk = peer_handshake(peer_info,info_hash)
             
     """    
     while block_num < 5:
