@@ -235,6 +235,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             peer_info = peer_sk.info
             info_hash = peer_sk.info_hash
             peer_sk.close()
+            print("Socket receiving no data, recreating socket")
             peer_sk = peer_handshake(peer_info,info_hash)
             
     """    
