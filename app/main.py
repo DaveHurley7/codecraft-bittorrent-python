@@ -140,6 +140,7 @@ def to_hexstr(valstr):
     for b in valstr:
         fbyte = b >> 4
         lbyte = b & 15
+        print("FBYTE",fbyte,"LBYTE",lbyte)
         hexstr += vals[fbyte] + vals[lbyte]
     return hexstr
 
@@ -201,20 +202,16 @@ def last_block(block_num,n_blocks,last_size):
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
-            print("Bitfield",msg[1:])
             break
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
-    print("Total piece length",piecelen)
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
         n_blocks += 1
-    #blocks_received = [] [None]*n_blocks
     piece_content = b""
-    #pending = []
     block_num = 0
     print("Amount of blocks:",n_blocks)
     while block_num < n_blocks:
@@ -223,7 +220,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
               b""+piece_id.to_bytes(4)+b""
               b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
               b""+block_size.to_bytes(4)+b"")
-        print("SENDING REQUEST",msg)
         peer_sk.sendall(msg)
         msg = read_msg(peer_sk)
         if msg[0:1] == MsgId.Piece:
@@ -232,52 +228,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             data = msg[9:]
             piece_content += msg[9:]
             block_num += 1
-            print("Downloaded",len(piece_content),"of",piecelen,"Block",block_num,"of",n_blocks)
-        if not msg:
-            peer_info = peer_sk.info
-            info_hash = peer_sk.info_hash
-            peer_sk.close()
-            print("Socket receiving no data, recreating socket")
-            peer_sk = peer_handshake(peer_info,info_hash)
-            
-    """    
-    while block_num < 5:
-        block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
-        msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
-              b""+piece_id.to_bytes(4)+b""
-              b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
-              b""+block_size.to_bytes(4)+b"")
-        peer_sk.sendall(msg)
-        pending.append(block_num)
-        #print("REQUESTED BLOCK",block_num)
-        block_num += 1
-        if block_num == n_blocks and block_num < 5:
-            break
-    while True:
-        if len(pending) < MAX_REQUESTS and block_num < n_blocks:
-            block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
-            print("Requesting",block_size,"bytes")
-            msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
-                    b""+piece_id.to_bytes(4)+b""
-                    b""+(block_num*MAX_BLOCK_SIZE).to_bytes(4)+b""
-                    b""+block_size.to_bytes(4)+b"")
-            #print("REQUEST MSG",msg)
-            peer_sk.sendall(msg)
-            pending.append(block_num)
-            #print("REQUESTED BLOCK",block_num)
-            block_num += 1    
-        if not pending:
-            break
-        msg = read_msg(peer_sk)
-        if msg[0:1] == MsgId.Piece:
-            resp_piece = int.from_bytes(msg[1:5])
-            offset = int.from_bytes(msg[5:9])
-            data = msg[9:]
-            block_id = offset // MAX_BLOCK_SIZE
-            blocks_received[block_id] = data
-            pending.remove(block_id)
-            #print("REMOVE BLOCK",block_id)"""
-    return piece_content #blocks_received
+    return piece_content
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
     content = handle_peer_msgs(peer_sk,piece_id,piecelen)
@@ -373,8 +324,6 @@ def main():
         peer_sk = peer_handshake(peer_info,info_hash)
         piece_start = piece_id*20
         n_pieces = len(decoded["info"]["pieces"])//20
-        print("Number of pieces:",n_pieces)
-        print("Attempting to download piece",piece_id)
         req_piece_len = decoded["info"]["piece length"]
         if piece_id + 1 == n_pieces:
             req_piece_len = file_len % req_piece_len
