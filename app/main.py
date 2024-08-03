@@ -207,7 +207,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
-    #print("Total piece length",piecelen)
+    print("Total piece length",piecelen)
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
@@ -372,9 +372,10 @@ def main():
         peer_info = choice(peers)
         peer_sk = peer_handshake(peer_info,info_hash)
         piece_start = piece_id*20
-        print("Number of pieces:",len(decoded["info"]["pieces"])//20)
+        n_pieces = len(decoded["info"]["pieces"])//20
+        print("Number of pieces:",n_pieces)
         print("Attempting to download piece",piece_id)
-        download_piece(peer_sk,piece_id,decoded["info"]["piece length"],decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
+        download_piece(peer_sk,piece_id,file_len if piece_id + 1 == n_pieces else decoded["info"]["piece length"],decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
         peer_sk.close()
     else:
         raise NotImplementedError(f"Unknown command {command}")
