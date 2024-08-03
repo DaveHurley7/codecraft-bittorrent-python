@@ -371,6 +371,7 @@ def main():
         peer_info = choice(peers)
         peer_sk = peer_handshake(peer_info,info_hash)
         piece_start = piece_id*20
+        print("Number of pieces:",len(decoded["info"]["pieces"])//20)
         print("Attempting to download piece",piece_id)
         download_piece(peer_sk,piece_id,decoded["info"]["piece length"],decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
         peer_sk.close()
