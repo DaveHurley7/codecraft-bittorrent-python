@@ -201,6 +201,7 @@ def last_block(block_num,n_blocks,last_size):
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
+            print("Bitfield",msg[1:])
             break
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
     while msg := read_msg(peer_sk):
@@ -214,7 +215,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
     #blocks_received = [] [None]*n_blocks
     piece_content = b""
     #pending = []
-    block_num = 0 if piece_id in [0,3] else 5
+    block_num = 0
     print("Amount of blocks:",n_blocks)
     while block_num < n_blocks:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
