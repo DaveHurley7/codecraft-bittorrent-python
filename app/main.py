@@ -377,7 +377,7 @@ def main():
         print("Attempting to download piece",piece_id)
         req_piece_len = decoded["info"]["piece length"]
         if piece_id + 1 == n_pieces:
-            req_piece_len = file_len - req_piece_len
+            req_piece_len = file_len % req_piece_len
         download_piece(peer_sk,piece_id,req_piece_len,decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
         peer_sk.close()
     else:
