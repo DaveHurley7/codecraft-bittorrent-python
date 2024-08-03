@@ -135,12 +135,11 @@ def make_socket(csk_info):
     return host, int(port)
 
 def to_hexstr(valstr):
-    vals = "012345679abcdef"
+    vals = "0123456789abcdef"
     hexstr = ""
     for b in valstr:
         fbyte = b >> 4
         lbyte = b & 15
-        print("FBYTE",fbyte,"LBYTE",lbyte)
         hexstr += vals[fbyte] + vals[lbyte]
     return hexstr
 
@@ -213,7 +212,6 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
         n_blocks += 1
     piece_content = b""
     block_num = 0
-    print("Amount of blocks:",n_blocks)
     while block_num < n_blocks:
         block_size = last_block_size if last_block(block_num,n_blocks,last_block_size) else MAX_BLOCK_SIZE
         msg = (b"\x00\x00\x00\x0d"+MsgId.Request+b""
