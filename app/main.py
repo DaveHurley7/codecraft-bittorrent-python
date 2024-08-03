@@ -231,7 +231,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             data = msg[9:]
             piece_content += msg[9:]
             block_num += 1
-            print("Downloaded",len(piece_content),"of",piecelen)
+            print("Downloaded",len(piece_content),"of",piecelen,"Block",block_num,"of",n_blocks)
         if not msg:
             peer_info = peer_sk.info
             info_hash = peer_sk.info_hash
