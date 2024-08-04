@@ -228,15 +228,14 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             block_num += 1
     return piece_content
     
-def download_piece(peer_sk,piece_id,piecelen,piece_hash,outfile):
+def download_piece(peer_sk,piece_id,piecelen,piece_hash):
     content = handle_peer_msgs(peer_sk,piece_id,piecelen)
     hasher = hashlib.sha1()
     hasher.update(content)
     if piece_hash != hasher.digest():
         print("Received piece doesn't match any piece hashes")
-    btfile = open(outfile,"wb")
-    btfile.write(content)
-    btfile.close()
+        return b""
+    return content
     
 def main():
     command = sys.argv[1]
@@ -310,9 +309,6 @@ def main():
         if not btfile:
             print("No .torrent file provided")
             quit(1)
-        if not isinstance(piece_id,int):
-            print("A piece must be specified")
-            quit(1)
         decoded = load_btfile_content(btfile)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
@@ -320,12 +316,22 @@ def main():
         peers = get_peer_list(tracker,info_hash,file_len)
         peer_info = choice(peers)
         peer_sk = peer_handshake(peer_info,info_hash)
-        piece_start = piece_id*20
         n_pieces = len(decoded["info"]["pieces"])//20
-        req_piece_len = decoded["info"]["piece length"]
-        if piece_id + 1 == n_pieces:
-            req_piece_len = file_len % req_piece_len
-        download_piece(peer_sk,piece_id,req_piece_len,decoded["info"]["pieces"][piece_start:piece_start+20],outfile) 
+        piece_len = decoded["info"]["piece length"]
+        if piece_id:
+            piece_start = piece_id*20
+            if piece_id + 1 == n_pieces:
+                piece_len = file_len % piece_len
+            piece_content = download_piece(peer_sk,piece_id,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
+        else:
+            for piece_num in range(piece_id):
+                if piece_num + 1 == n_pieces:
+                    piece_len = file_len % piece_len
+                piece_start = piece_num*20
+            piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])       
+        btfile = open(outfile,"wb")
+        btfile.write(piece_content)
+        btfile.close()
         peer_sk.close()
     else:
         raise NotImplementedError(f"Unknown command {command}")
