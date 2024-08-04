@@ -199,13 +199,16 @@ def last_block(block_num,n_blocks,last_size):
     return True
 
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
+    print("BITFIELD")
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Bitfield:
             break
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
+    print("INTERESTED")
     while msg := read_msg(peer_sk):
         if msg[0:1] == MsgId.Unchoke:
             break
+    print("UNCHOKED")
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
