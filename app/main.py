@@ -356,12 +356,14 @@ def main():
         n_pieces = len(decoded["info"]["pieces"])//20
         piece_len = decoded["info"]["piece length"]
         btfile = open(outfile,"wb")
+        print("File has",n_pieces,"pieces")
         for piece_num in range(n_pieces):
             if piece_num + 1 == n_pieces:
                 piece_len = file_len % piece_len
             piece_start = piece_num*20
             piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
             btfile.write(piece_content)
+            print("Completed piece",piece_num,"of",n_pieces)
         btfile.close()
         peer_sk.close()
     else:
