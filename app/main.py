@@ -201,6 +201,7 @@ def last_block(block_num,n_blocks,last_size):
 def handle_peer_msgs(peer_sk, piece_id, piecelen):
     print("BITFIELD")
     while msg := read_msg(peer_sk):
+        print(msg)
         if msg[0:1] == MsgId.Bitfield:
             break
     peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
