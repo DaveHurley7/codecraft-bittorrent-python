@@ -309,6 +309,9 @@ def main():
         if not btfile:
             print("No .torrent file provided")
             quit(1)
+        if not instance(piece_id,int):
+            print("Piece number must be specified")
+            quit(1)
         decoded = load_btfile_content(btfile)
         tracker = decoded["announce"].decode()
         info_hash = make_hash(enc_bencode(decoded["info"]))
@@ -318,19 +321,47 @@ def main():
         peer_sk = peer_handshake(peer_info,info_hash)
         n_pieces = len(decoded["info"]["pieces"])//20
         piece_len = decoded["info"]["piece length"]
-        if piece_id:
-            piece_start = piece_id*20
-            if piece_id + 1 == n_pieces:
-                piece_len = file_len % piece_len
-            piece_content = download_piece(peer_sk,piece_id,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
-        else:
-            for piece_num in range(piece_id):
-                if piece_num + 1 == n_pieces:
-                    piece_len = file_len % piece_len
-                piece_start = piece_num*20
-            piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])       
+        piece_start = piece_id*20
+        if piece_id + 1 == n_pieces:
+            piece_len = file_len % piece_len
+        piece_content = download_piece(peer_sk,piece_id,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])   
         btfile = open(outfile,"wb")
         btfile.write(piece_content)
+        btfile.close()
+        peer_sk.close()
+    elif command == "download":
+        btfile = None
+        outfile = None
+        argc = 2
+        argmax = len(sys.argv)
+        while argc < argmax:
+            if sys.argv[argc].endswith(".torrent"):
+                btfile = sys.argv[argc]
+            elif sys.argv[argc] == "-o":
+                argc += 1
+                outfile = sys.argv[argc]
+            else:
+                print("invalid argument: ", sys.argv[argc])
+            argc += 1
+        if not btfile:
+            print("No .torrent file provided")
+            quit(1)
+        decoded = load_btfile_content(btfile)
+        tracker = decoded["announce"].decode()
+        info_hash = make_hash(enc_bencode(decoded["info"]))
+        file_len = decoded["info"]["length"]
+        peers = get_peer_list(tracker,info_hash,file_len)
+        peer_info = choice(peers)
+        peer_sk = peer_handshake(peer_info,info_hash)
+        n_pieces = len(decoded["info"]["pieces"])//20
+        piece_len = decoded["info"]["piece length"]
+        btfile = open(outfile,"wb")
+        for piece_num in range(piece_id):
+            if piece_num + 1 == n_pieces:
+                piece_len = file_len % piece_len
+            piece_start = piece_num*20
+            piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
+            btfile.write(piece_content)
         btfile.close()
         peer_sk.close()
     else:
