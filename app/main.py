@@ -185,7 +185,6 @@ def last_block(block_num,n_blocks,last_size):
 def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs):
     if not only_reqs:
         while msg := read_msg(peer_sk):
-            print(msg)
             if msg[0:1] == MsgId.Bitfield:
                 break
         peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
@@ -345,7 +344,7 @@ def main():
         btfile = open(outfile,"wb")
         print("File has",n_pieces,"pieces")
         for piece_num in range(n_pieces):
-            print("Downloading piece",piece_num)
+            print("Downloading piece",piece_num+1)
             if piece_num + 1 == n_pieces:
                 piece_len = file_len % piece_len
             only_reqs = True
@@ -355,7 +354,7 @@ def main():
             piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20],only_reqs)
             if piece_content:
                 btfile.write(piece_content)
-            print("Completed piece",piece_num,"of",n_pieces)
+            print("Completed piece",piece_num+1,"of",n_pieces)
         btfile.close()
         peer_sk.close()
     else:
