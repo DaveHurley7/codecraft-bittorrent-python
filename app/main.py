@@ -226,6 +226,7 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             data = msg[9:]
             piece_content += msg[9:]
             block_num += 1
+            print("Received block",block_num,"of",n_blocks)
     return piece_content
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash):
@@ -234,7 +235,7 @@ def download_piece(peer_sk,piece_id,piecelen,piece_hash):
     hasher.update(content)
     if piece_hash != hasher.digest():
         print("Received piece doesn't match any piece hashes")
-        return b""
+        return None
     return content
     
 def main():
@@ -324,10 +325,11 @@ def main():
         piece_start = piece_id*20
         if piece_id + 1 == n_pieces:
             piece_len = file_len % piece_len
-        piece_content = download_piece(peer_sk,piece_id,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])   
-        btfile = open(outfile,"wb")
-        btfile.write(piece_content)
-        btfile.close()
+        piece_content = download_piece(peer_sk,piece_id,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20]) 
+        if piece_content:
+            btfile = open(outfile,"wb")
+            btfile.write(piece_content)
+            btfile.close()
         peer_sk.close()
     elif command == "download":
         btfile = None
@@ -358,11 +360,13 @@ def main():
         btfile = open(outfile,"wb")
         print("File has",n_pieces,"pieces")
         for piece_num in range(n_pieces):
+            print("Downloading piece",piece_num)
             if piece_num + 1 == n_pieces:
                 piece_len = file_len % piece_len
             piece_start = piece_num*20
             piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
-            btfile.write(piece_content)
+            if piece_content:
+                btfile.write(piece_content)
             print("Completed piece",piece_num,"of",n_pieces)
         btfile.close()
         peer_sk.close()
