@@ -115,21 +115,6 @@ def get_peer_list(tracker_url,info_hash,file_len):
     peer_list = extract_peers(content[0]["peers"])
     return peer_list
 
-class ReconnectableSocket:
-    def __init__(self,socket,addr,info_hash):
-        self.sk = socket
-        self.info = addr
-        self.info_hash = info_hash
-        
-    def sendall(self,message):
-        self.sk.sendall(message)
-        
-    def recv(self,length):
-        return self.sk.recv(length)
-            
-    def close(self):
-        self.sk.close()
-
 def make_socket(csk_info):
     host, port = csk_info.split(":")
     return host, int(port)
@@ -164,11 +149,10 @@ def peer_handshake(peer,info_hash):
             sleep(waittime)
             waittime **= 2
     peer_id = resp[48:]
-    return ReconnectableSocket(sk,peer,info_hash)
+    return sk,peer
 
 def read_msg(peer):
     d_in = peer.recv(4)
-    #print("MSGLEN",d_in)
     msglen = int.from_bytes(d_in)
     payload = b""
     len_recv = 0
@@ -198,18 +182,16 @@ def last_block(block_num,n_blocks,last_size):
         return False
     return True
 
-def handle_peer_msgs(peer_sk, piece_id, piecelen):
-    print("BITFIELD")
-    while msg := read_msg(peer_sk):
-        print(msg)
-        if msg[0:1] == MsgId.Bitfield:
-            break
-    peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
-    print("INTERESTED")
-    while msg := read_msg(peer_sk):
-        if msg[0:1] == MsgId.Unchoke:
-            break
-    print("UNCHOKED")
+def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs=False):
+    if not only_reqs:
+        while msg := read_msg(peer_sk):
+            print(msg)
+            if msg[0:1] == MsgId.Bitfield:
+                break
+        peer_sk.sendall(b"\x00\x00\x00\x01"+MsgId.Interested)
+        while msg := read_msg(peer_sk):
+            if msg[0:1] == MsgId.Unchoke:
+                break
     last_block_size = piecelen % MAX_BLOCK_SIZE
     n_blocks = piecelen // MAX_BLOCK_SIZE
     if last_block_size:
@@ -233,8 +215,8 @@ def handle_peer_msgs(peer_sk, piece_id, piecelen):
             print("Received block",block_num,"of",n_blocks)
     return piece_content
     
-def download_piece(peer_sk,piece_id,piecelen,piece_hash):
-    content = handle_peer_msgs(peer_sk,piece_id,piecelen)
+def download_piece(peer_sk,piece_id,piecelen,piece_hash,only_reqs):
+    content = handle_peer_msgs(peer_sk,piecelen,piece_id,only_reqs)
     hasher = hashlib.sha1()
     hasher.update(content)
     if piece_hash != hasher.digest():
@@ -367,8 +349,11 @@ def main():
             print("Downloading piece",piece_num)
             if piece_num + 1 == n_pieces:
                 piece_len = file_len % piece_len
+            only_reqs = True
+            if not piece_num:
+                only_reqs = False
             piece_start = piece_num*20
-            piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20])
+            piece_content = download_piece(peer_sk,piece_num,piece_len,decoded["info"]["pieces"][piece_start:piece_start+20],only_reqs)
             if piece_content:
                 btfile.write(piece_content)
             print("Completed piece",piece_num,"of",n_pieces)
