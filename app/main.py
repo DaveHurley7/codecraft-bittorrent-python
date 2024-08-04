@@ -212,7 +212,6 @@ def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs=False):
             data = msg[9:]
             piece_content += msg[9:]
             block_num += 1
-            print("Received block",block_num,"of",n_blocks)
     return piece_content
     
 def download_piece(peer_sk,piece_id,piecelen,piece_hash,only_reqs):
@@ -296,7 +295,7 @@ def main():
         if not btfile:
             print("No .torrent file provided")
             quit(1)
-        if not instance(piece_id,int):
+        if not isinstance(piece_id,int):
             print("Piece number must be specified")
             quit(1)
         decoded = load_btfile_content(btfile)
