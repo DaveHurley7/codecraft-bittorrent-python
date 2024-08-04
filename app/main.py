@@ -149,7 +149,7 @@ def peer_handshake(peer,info_hash):
             sleep(waittime)
             waittime **= 2
     peer_id = resp[48:]
-    return sk,peer
+    return sk
 
 def read_msg(peer):
     d_in = peer.recv(4)
