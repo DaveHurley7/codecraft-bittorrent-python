@@ -356,7 +356,7 @@ def main():
         n_pieces = len(decoded["info"]["pieces"])//20
         piece_len = decoded["info"]["piece length"]
         btfile = open(outfile,"wb")
-        for piece_num in range(piece_id):
+        for piece_num in range(n_pieces):
             if piece_num + 1 == n_pieces:
                 piece_len = file_len % piece_len
             piece_start = piece_num*20
