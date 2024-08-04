@@ -182,7 +182,7 @@ def last_block(block_num,n_blocks,last_size):
         return False
     return True
 
-def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs=False):
+def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs):
     if not only_reqs:
         while msg := read_msg(peer_sk):
             print(msg)
@@ -214,7 +214,7 @@ def handle_peer_msgs(peer_sk, piecelen, piece_id, only_reqs=False):
             block_num += 1
     return piece_content
     
-def download_piece(peer_sk,piece_id,piecelen,piece_hash,only_reqs):
+def download_piece(peer_sk,piece_id,piecelen,piece_hash,only_reqs=False):
     content = handle_peer_msgs(peer_sk,piecelen,piece_id,only_reqs)
     hasher = hashlib.sha1()
     hasher.update(content)
